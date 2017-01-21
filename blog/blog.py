@@ -1,5 +1,7 @@
 import os
 import sqlite3
+import markdown
+from slugify import slugify
 from flask import Flask
 from flask import request
 from flask import session
@@ -57,7 +59,7 @@ def initdb_command():
 @app.route('/')
 def index():
     db = get_db()
-    cur = db.execute("SELECT title, text FROM posts ORDER BY created_date DESC")
+    cur = db.execute("SELECT title, text_compiled FROM posts ORDER BY created_date DESC")
     posts = cur.fetchall()
     return render_template('index.html', posts=posts)
 
@@ -66,12 +68,17 @@ def add_post():
     if not session.get('logged_in'):
         print(request.form)
         abort(401)
+
     db = get_db()
-    raw_text = request.form['text']
-    formatted_text = raw_text.replace('\r\n', '<br />')
-    print(formatted_text)
-    db.execute("INSERT INTO posts (title, text) VALUES (?, ?)",
-            [request.form['title'], formatted_text])
+    
+    # Prepare Post
+    title = request.form['title']
+    text_raw = request.form['text']
+    slug = slugify(title)
+    text_compiled = markdown.markdown(text_raw)
+    
+    db.execute("INSERT INTO posts (title, slug, text_raw, text_compiled) \
+        VALUES (?, ?, ?, ?)", [title, slug, text_raw, text_compiled])
     db.commit()
     flash('New post added!')
     return redirect(url_for('index'))
