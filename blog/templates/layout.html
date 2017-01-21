@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Lev's Hacking Notes</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	</head>
+
+	<body>
+
+		<h1> Lev's Hacking Notes </h1>
+
+		<nav>
+			{% if not session.logged_in %}
+			<a href="{{ url_for('login') }}">Log In</a>
+			{% else %}
+			<a href="{{ url_for('logout') }}">Log Out</a>
+			{% endif %}
+		</nav>
+
+		{% for message in get_flashed_messages() %}
+		
+		<span class="flash">{{ message }}</span>
+
+		{% endfor %}
+
+		{% block body %}
+		{% endblock %}
+	</body>
+</html>
+

@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	{% if session.logged_in %}
+	
+	<h2> Add New Post</h2>
+
+	{% if error %}
+	<p class="error">
+		{{ error }}
+	</p>
+	{% endif %}
+	
+	<form action="{{ url_for('add_post') }}" method="POST">
+		<input type="text" name="title" placeholder="Post Title">
+		<br />
+		<br />
+		<textarea name="text" rows=10 cols=40 placeholder="Post Body"></textarea>
+		<br />
+		<br />
+		<input type="submit" value="Publish">
+	</form>
+
+	{% endif %}
+
+	<ul class="posts">
+		{% for post in posts %}
+		<li>
+			<h2> {{ post.title }} </h2>
+			<p> {{ post.text }} </p>
+		</li>
+		{% else %}
+		<p> Hm. Nothing here. </p>
+		{% endfor %}
+	</ul>
+{% endblock %}
