@@ -24,14 +24,14 @@
 
 	{% endif %}
 
-	<ul class="posts">
-		{% for post in posts %}
-		<li>
-			<h2> {{ post.title }} </h2>
-			<p> {{ post.text }} </p>
-		</li>
-		{% else %}
-		<p> Hm. Nothing here. </p>
-		{% endfor %}
-	</ul>
+	{% for post in posts %}
+	<h2 class="postTitle">
+		{{ post.title }}
+	</h2>
+	
+	<p class="postText">
+		{{ post.text|safe }}
+	</p>
+	{% endfor %}
+
 {% endblock %}

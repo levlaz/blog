@@ -67,8 +67,11 @@ def add_post():
         print(request.form)
         abort(401)
     db = get_db()
+    raw_text = request.form['text']
+    formatted_text = raw_text.replace('\r\n', '<br />')
+    print(formatted_text)
     db.execute("INSERT INTO posts (title, text) VALUES (?, ?)",
-            [request.form['title'], request.form['text']])
+            [request.form['title'], formatted_text])
     db.commit()
     flash('New post added!')
     return redirect(url_for('index'))
