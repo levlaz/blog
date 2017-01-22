@@ -44,3 +44,20 @@ nav > a {
 .postText {
 	border-bottom: solid 1px lightgray;
 }
+
+footer {
+	padding-top: 10px;
+	padding-bottom: 30px;
+}
+
+.cc {
+	margin-top: 5px;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
