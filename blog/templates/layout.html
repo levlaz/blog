@@ -8,9 +8,11 @@
 
 	<body>
 
-		<h1> Lev's Hacking Notes </h1>
+		<h1 class="blogTitle"> Lev's Hacking Notes </h1>
 
 		<nav>
+			<a href="{{ url_for('index') }}">Home</a>
+			<a href="#">RSS</a>
 			{% if not session.logged_in %}
 			<a href="{{ url_for('login') }}">Log In</a>
 			{% else %}

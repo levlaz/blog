@@ -2,5 +2,6 @@
 *.egg-info/
 env/
 *.swp
+*.swo
 *.pyc
 *.db

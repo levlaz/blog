@@ -19,6 +19,9 @@
 		<textarea name="text" rows=10 cols=40 placeholder="Post Body"></textarea>
 		<br />
 		<br />
+		<input type="text" name="tags" placeholder="Tags">
+		<br />
+		<br />
 		<input type="submit" value="Publish">
 	</form>
 
@@ -28,10 +31,14 @@
 	<h2 class="postTitle">
 		{{ post.title }}
 	</h2>
-	
-	<p class="postText">
-		{{ post.text_compiled|safe }}
+
+	<p class="postDate">
+		{{ post.created_date }}
 	</p>
+	
+	<div class="postText">
+		{{ post.text_compiled|safe }}
+	</div>
 	{% endfor %}
 
 {% endblock %}

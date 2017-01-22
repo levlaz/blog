@@ -59,7 +59,7 @@ def initdb_command():
 @app.route('/')
 def index():
     db = get_db()
-    cur = db.execute("SELECT title, text_compiled FROM posts ORDER BY created_date DESC")
+    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC")
     posts = cur.fetchall()
     return render_template('index.html', posts=posts)
 
@@ -70,16 +70,35 @@ def add_post():
         abort(401)
 
     db = get_db()
+    cursor = db.cursor()
     
     # Prepare Post
     title = request.form['title']
     text_raw = request.form['text']
     slug = slugify(title)
     text_compiled = markdown.markdown(text_raw)
-    
-    db.execute("INSERT INTO posts (title, slug, text_raw, text_compiled) \
+    tags = request.form['tags'].split(',')
+
+    cursor.execute("INSERT INTO posts (title, slug, text_raw, text_compiled) \
         VALUES (?, ?, ?, ?)", [title, slug, text_raw, text_compiled])
+    post_id = cursor.lastrowid
     db.commit()
+    
+    for tag in tags:
+        existing_id = find_tag(tag.strip())
+        print(tag)
+        print(tag.strip())
+        if existing_id:
+            cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                VALUES(?, ?)", [post_id, existing_id])
+            db.commit()
+        else:
+            cursor.execute("INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
+            tag_id = cursor.lastrowid
+            cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                VALUES(?, ?)", [post_id, tag_id])
+            db.commit()
+            
     flash('New post added!')
     return redirect(url_for('index'))
 
@@ -102,3 +121,9 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('index'))
+
+def find_tag(tag):
+    db = get_db()
+    cur = db.execute("SELECT id FROM tags WHERE tag = ?", [tag]).fetchone()
+    if cur:
+        return cur[0]
