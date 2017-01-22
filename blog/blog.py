@@ -78,9 +78,7 @@ def index():
 def show_post(post_slug):
     db = get_db()
     post = db.execute("SELECT * FROM posts WHERE slug = ?", [post_slug]).fetchone()
-    print(post)
-    tags = get_tags(post[0])
-    return render_template('post.html', post=post, tags=tags)
+    return render_template('post.html', post=post, get_tags=get_tags)
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_post(id):

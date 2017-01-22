@@ -10,8 +10,8 @@
 		{{ post.created_date }}
 		
 		Tags:
-		{% for tag in tags  %}
-			<a href="#">{{ tag.tag }}</a>
+		{% for tag in get_tags(post.id)  %}
+		<a href="{{ url_for('show_posts_with_tag', tag=tag.tag) }}">{{ tag.tag }}</a>
 		{% endfor %}
 	</p>
 	
