@@ -14,7 +14,7 @@ CREATE TABLE posts (
 /** 
  * Create index for slug, title, and text_raw
  */
-CREATE INDEX slug_idx ON posts(slug);
+CREATE UNIQUE INDEX slug_idx ON posts(slug);
 CREATE INDEX title_idx ON posts(title);
 CREATE INDEX text_raw_idx ON posts(text_raw);
 

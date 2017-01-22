@@ -61,7 +61,14 @@ def index():
     db = get_db()
     cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC")
     posts = cur.fetchall()
-    return render_template('index.html', posts=posts)
+    return render_template('index.html', posts=posts, get_tags=get_tags)
+
+@app.route('/<string:post_slug>')
+def show_post(post_slug):
+    db = get_db()
+    post = db.execute("SELECT * FROM posts WHERE slug = ?", [post_slug]).fetchone()
+    tags = get_tags(post[0])
+    return render_template('post.html', post=post, tags=tags)
 
 @app.route('/add', methods=['POST'])
 def add_post():
@@ -127,3 +134,13 @@ def find_tag(tag):
     cur = db.execute("SELECT id FROM tags WHERE tag = ?", [tag]).fetchone()
     if cur:
         return cur[0]
+
+def get_tags(post_id):
+    db = get_db()
+    cur = db.execute("""
+        SELECT tag FROM tags t
+            JOIN posts_tags pt ON t.id = pt.tag_id
+            JOIN posts p ON p.id = pt.post_id
+            WHERE p.id = ?""", [post_id]).fetchall()
+    return cur
+            

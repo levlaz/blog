@@ -29,11 +29,16 @@
 
 	{% for post in posts %}
 	<h2 class="postTitle">
-		{{ post.title }}
+		<a href="{{ post.slug }}">{{ post.title }}</a>
 	</h2>
 
 	<p class="postDate">
 		{{ post.created_date }}
+		
+		Tags:
+		{% for tag in get_tags(post.id) %}
+			<a href="#">{{ tag.tag }}</a>
+		{% endfor %}
 	</p>
 	
 	<div class="postText">

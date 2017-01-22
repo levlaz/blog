@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	<h2 class="postTitle">
+		<a href="{{ post.slug }}">{{ post.title }}</a>
+	</h2>
+
+	<p class="postDate">
+		{{ post.created_date }}
+		
+		Tags:
+		{% for tag in tags  %}
+			<a href="#">{{ tag.tag }}</a>
+		{% endfor %}
+	</p>
+	
+	<div class="postText">
+		{{ post.text_compiled|safe }}
+	</div>
+
+{% endblock %}
