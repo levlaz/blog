@@ -11,6 +11,8 @@ from flask import url_for
 from flask import abort
 from flask import render_template
 from flask import flash
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -18,8 +20,7 @@ app.config.from_object(__name__)
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'blog.db'),
     SECRET_KEY='super secret',
-    USERNAME='admin',
-    PASSWORD='password'
+    PASSWORD='pbkdf2:sha512:1000$kpnamXwS$029e97b8a913b57b6c3263af1dbc7e0a2704fa9f961e12205e7831201b5e4800e07aa5e3948e9fca78d98acba8bcd6ce86d45d12c5896d26aebeabb684cf94f9'
 ))
 app.config.from_envvar('BLOG_SETTINGS', silent=True)
 
@@ -54,6 +55,13 @@ def initdb_command():
     """Initializes the database."""
     init_db()
     print("Initialized the database.")
+
+@app.cli.command('genpass')
+def generate_password_command():
+    """Generates a salted password hash."""
+    password = input('Please enter a secure password: ')
+    password_hash = generate_password_hash(password, method="pbkdf2:sha512")
+    print("Your password hash is:\n {0} \n Add this hash to the app config".format(password_hash))
 
 """ Views """
 @app.route('/')
@@ -149,9 +157,7 @@ def add_post():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid Username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        if not verify_password(request.form['password']):
             error = 'Invalid password'
         else:
             session['logged_in'] = True
@@ -179,4 +185,9 @@ def get_tags(post_id):
             JOIN posts p ON p.id = pt.post_id
             WHERE p.id = ?""", [post_id]).fetchall()
     return cur
-            
+
+def verify_password(password):
+    return check_password_hash(app.config['PASSWORD'], password)
+
+if __name__ == "__main__":
+    app.run()
