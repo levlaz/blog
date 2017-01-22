@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	{% if session.logged_in %}
+	
+	<h2>Edit Post</h2>
+
+	{% if error %}
+	<p class="error">
+		{{ error }}
+	</p>
+	{% endif %}
+	
+	<form action="{{ url_for('edit_post', id=post.id) }}" method="POST">
+		<input type="text" name="title" placeholder="Post Title" value={{post.title|safe}}>
+		<br />
+		<br />
+		<textarea name="text" rows=10 cols=40 placeholder="Post Body">
+			{{ post.text_raw }}
+		</textarea>
+		<br />
+		<br />
+		<input type="text" name="tags" placeholder="Tags">
+		<br />
+		<br />
+		<input type="submit" value="Publish">
+	</form>
+
+	{% endif %}
+
+{% endblock %}

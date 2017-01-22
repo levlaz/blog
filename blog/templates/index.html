@@ -4,7 +4,7 @@
 
 	{% if session.logged_in %}
 	
-	<h2> Add New Post</h2>
+	<h2>Add New Post</h2>
 
 	{% if error %}
 	<p class="error">
@@ -29,21 +29,29 @@
 
 	{% for post in posts %}
 	<h2 class="postTitle">
-		<a href="{{ post.slug }}">{{ post.title }}</a>
+		<a href="/{{ post.slug }}">{{ post.title }}</a>
 	</h2>
 
 	<p class="postDate">
 		{{ post.created_date }}
 		
-		Tags:
+		][ Tags:
 		{% for tag in get_tags(post.id) %}
-			<a href="#">{{ tag.tag }}</a>
+			<a href="{{ url_for('show_posts_with_tag', tag=tag.tag) }}">{{ tag.tag }}</a>
 		{% endfor %}
 	</p>
 	
 	<div class="postText">
 		{{ post.text_compiled|safe }}
+
+		{% if session.logged_in %}
+			<p class="postActions">
+				<a href="{{ url_for('edit_post', id=post.id)}}">Edit</a>	
+				<a href="{{ url_for('delete_post', id=post.id)}}">Delete</a>
+			</p>
+		{% endif %}
 	</div>
+
 	{% endfor %}
 
 {% endblock %}

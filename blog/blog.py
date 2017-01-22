@@ -61,7 +61,10 @@ def index():
     db = get_db()
     cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC")
     posts = cur.fetchall()
-    return render_template('index.html', posts=posts, get_tags=get_tags)
+    return render_template('index.html', 
+            posts=posts, 
+            get_tags=get_tags,
+            form_title="Add New Post")
 
 @app.route('/<string:post_slug>')
 def show_post(post_slug):
@@ -70,10 +73,43 @@ def show_post(post_slug):
     tags = get_tags(post[0])
     return render_template('post.html', post=post, tags=tags)
 
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_post(id):
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    post = db.execute("SELECT * FROM posts WHERE id = ?", [id]).fetchone()
+    tags = get_tags(post[0])
+    return render_template('edit.html', post=post, tags=tags)
+
+@app.route('/delete/<int:id>')
+def delete_post(id):
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    db.execute("DELETE FROM posts WHERE id = ?", [id])
+    db.commit()
+    
+    flash('Post deleted!')
+    return redirect(url_for('index'))
+
+@app.route('/tag/<string:tag>')
+def show_posts_with_tag(tag):
+    db = get_db()
+    posts = db.execute("""
+        SELECT * from posts p
+            JOIN posts_tags pt on pt.post_id = p.id
+            JOIN tags t on t.id = pt.tag_id
+            WHERE t.tag = ?""", [tag]).fetchall()
+    description = "Posts tagged: {0}".format(tag)
+    return render_template('index.html',
+        posts=posts,
+        get_tags=get_tags,
+        description=description)
+
 @app.route('/add', methods=['POST'])
 def add_post():
     if not session.get('logged_in'):
-        print(request.form)
         abort(401)
 
     db = get_db()
@@ -81,7 +117,7 @@ def add_post():
     
     # Prepare Post
     title = request.form['title']
-    text_raw = request.form['text']
+    text_raw = request.form['text'].strip()
     slug = slugify(title)
     text_compiled = markdown.markdown(text_raw)
     tags = request.form['tags'].split(',')
