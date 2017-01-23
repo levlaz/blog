@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import markdown
+import datetime
 from slugify import slugify
 from flask import Flask
 from flask import request
@@ -11,6 +12,7 @@ from flask import url_for
 from flask import abort
 from flask import render_template
 from flask import flash
+from flask import make_response
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -70,6 +72,18 @@ def index():
             posts=posts, 
             get_tags=get_tags,
             form_title="Add New Post")
+
+@app.route('/feed')
+def gen_feed():
+    db = get_db()
+    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 10")
+    posts = cur.fetchall()
+    feed = render_template('rss.xml',
+            posts=posts,
+            gen_date=datetime.datetime.utcnow())
+    response = make_response(feed)
+    response.headers['Content-Type'] = "application/xml"
+    return response
 
 @app.route('/<string:post_slug>')
 def show_post(post_slug):
