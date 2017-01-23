@@ -3,5 +3,7 @@ machine:
     version: 3.5.2
 
 test:
+  pre:
+    - cp blog/settings.example.cfg blog/settings.cfg
   override:
     - export BLOG_PATH=$(pwd) && python tests/blog_tests.py
