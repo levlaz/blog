@@ -15,14 +15,11 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
-app.config.from_object(__name__)
+app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'blog.db'),
-    SECRET_KEY='super secret',
-    PASSWORD='pbkdf2:sha512:1000$kpnamXwS$029e97b8a913b57b6c3263af1dbc7e0a2704fa9f961e12205e7831201b5e4800e07aa5e3948e9fca78d98acba8bcd6ce86d45d12c5896d26aebeabb684cf94f9'
 ))
-app.config.from_envvar('BLOG_SETTINGS', silent=True)
 
 def connect_db():
     """Connects to Database"""
