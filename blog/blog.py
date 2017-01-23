@@ -107,7 +107,8 @@ def show_posts_with_tag(tag):
         SELECT * from posts p
             JOIN posts_tags pt on pt.post_id = p.id
             JOIN tags t on t.id = pt.tag_id
-            WHERE t.tag = ?""", [tag]).fetchall()
+            WHERE t.tag = ?
+            ORDER BY p.created_date DESC""", [tag]).fetchall()
     description = "Posts tagged: {0}".format(tag)
     return render_template('index.html',
         posts=posts,
