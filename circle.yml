@@ -6,4 +6,4 @@ machine:
 
 test:
   override:
-    - python tests/test_blog.py
+    - python tests/blog_tests.py
