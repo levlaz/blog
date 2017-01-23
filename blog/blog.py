@@ -110,7 +110,7 @@ def show_posts_with_tag(tag):
             WHERE t.tag = ?
             ORDER BY p.created_date DESC""", [tag]).fetchall()
     description = "Posts tagged: {0}".format(tag)
-    return render_template('index.html',
+    return render_template('tags.html',
         posts=posts,
         get_tags=get_tags,
         description=description)
