@@ -6,6 +6,7 @@ body {
 	margin-right: auto;
 }
 
+
 nav {
 	text-align: center;
 }
@@ -60,4 +61,28 @@ footer {
 
 .right {
 	float: right;
+}
+
+@media only screen and (max-device-width: 480px) {
+
+	.blogTitle {
+		width: 100%;
+	}
+
+	footer {
+		text-align: center;
+	}
+
+	footer > a:before {
+		content:"\a";
+		white-space: pre;
+	}
+
+	.left {
+		float: none;
+	}
+
+	.right {
+		float: none;
+	}
 }
