@@ -2,7 +2,7 @@ machine:
   python:
     version: 3.5.2
   environment:
-    BLOG_PATH:"/home/ubuntu/git/blog"
+    BLOG_PATH: "/home/ubuntu/git/blog"
 
 test:
   override:
