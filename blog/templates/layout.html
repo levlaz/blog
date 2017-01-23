@@ -13,7 +13,7 @@
 
 		<nav>
 			<a href="{{ url_for('index') }}">Home</a>
-			<a href="#">RSS</a>
+			<a href="/feed">RSS</a>
 			{% if not session.logged_in %}
 			<a href="{{ url_for('login') }}">Log In</a>
 			{% else %}
