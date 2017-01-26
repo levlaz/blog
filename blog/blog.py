@@ -157,6 +157,17 @@ def delete_post(id):
     flash('Post deleted!')
     return redirect(url_for('index'))
 
+@app.route('/tags')
+def show_tags_list():
+    db = get_db()
+    tags = db.execute("""
+        SELECT t.tag, COUNT(pt.tag_id) FROM tags t
+            JOIN posts_tags pt on pt.tag_id = t.id
+            GROUP BY t.tag
+            ORDER BY COUNT(pt.tag_id) DESC""").fetchall()
+    return render_template('tags_list.html', tags=tags)
+
+
 @app.route('/tag/<string:tag>')
 def show_posts_with_tag(tag):
     db = get_db()

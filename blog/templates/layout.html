@@ -15,7 +15,8 @@
 
 		<nav>
 			<a href="{{ url_for('index') }}">Home</a>
-			<a href="/feed">RSS</a>
+			<a href="{{ url_for('show_tags_list') }}">Tags</a>
+			<a href="{{ url_for('gen_feed') }}">RSS</a>
 			{% if not session.logged_in %}
 			<a href="{{ url_for('login') }}">Log In</a>
 			{% else %}

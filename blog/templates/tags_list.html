@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	<h2> All Tags </h2>
+	<ul>
+	{% for tag in tags %}
+		<li>
+			<a href="{{ url_for('show_posts_with_tag', tag=tag.tag) }}">
+				{{ tag.tag }} ({{ tag[1] }})
+			</a>
+		</li>
+	{% endfor %}
+	</ul>
+
+{% endblock %}
