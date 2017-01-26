@@ -108,7 +108,10 @@ def edit_post(id):
         title = request.form['title']
         text_raw = request.form['text'].strip()
         slug = slugify(title)
-        text_compiled = markdown.markdown(text_raw)
+        text_compiled = markdown.markdown(
+                text_raw, extensions=[
+                    'markdown.extensions.fenced_code', 
+                    'markdown.extensions.codehilite'])
         tags = request.form['tags'].split(',')
 
         cursor.execute("UPDATE posts \
@@ -181,7 +184,10 @@ def add_post():
     title = request.form['title']
     text_raw = request.form['text'].strip()
     slug = slugify(title)
-    text_compiled = markdown.markdown(text_raw)
+    text_compiled = markdown.markdown(
+            text_raw, extensions=[
+                'markdown.extensions.fenced_code', 
+                'markdown.extensions.codehilite'])
     tags = request.form['tags'].split(',')
 
     cursor.execute("INSERT INTO posts (title, slug, text_raw, text_compiled) \
