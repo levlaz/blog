@@ -98,10 +98,50 @@ def show_post(post_slug):
 def edit_post(id):
     if not session.get('logged_in'):
         abort(401)
+
     db = get_db()
+    cursor = db.cursor()
+
+    if request.method == 'POST':
+
+        # Prepare Post
+        title = request.form['title']
+        text_raw = request.form['text'].strip()
+        slug = slugify(title)
+        text_compiled = markdown.markdown(text_raw)
+        tags = request.form['tags'].split(',')
+
+        cursor.execute("UPDATE posts \
+                SET title = ?, \
+                slug = ?, \
+                text_raw = ?, \
+                text_compiled = ? \
+                WHERE id = ?", [title, slug, text_raw, text_compiled, id])
+        db.commit()
+        
+        for tag in tags:
+            existing_id = find_tag(tag.strip())
+            if existing_id:
+                cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                    VALUES(?, ?)", [id, existing_id])
+                db.commit()
+            else:
+                cursor.execute("INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
+                tag_id = cursor.lastrowid
+                cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                    VALUES(?, ?)", [id, tag_id])
+                db.commit()
+                
+        flash('Post updated')
+        return redirect(url_for('show_post', post_slug=slug))
+    
     post = db.execute("SELECT * FROM posts WHERE id = ?", [id]).fetchone()
     tags = get_tags(post[0])
-    return render_template('edit.html', post=post, tags=tags)
+    csv_tags = ""
+    for tag in tags:
+        print(dir(tag))
+        csv_tags.join("{0},".format(tag))
+    return render_template('edit.html', post=post, tags=csv_tags)
 
 @app.route('/delete/<int:id>')
 def delete_post(id):
@@ -151,8 +191,6 @@ def add_post():
     
     for tag in tags:
         existing_id = find_tag(tag.strip())
-        print(tag)
-        print(tag.strip())
         if existing_id:
             cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
                 VALUES(?, ?)", [post_id, existing_id])
