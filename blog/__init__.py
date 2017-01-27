@@ -1,1 +1,1 @@
-from .blog import app
+from .blog import app  # noqa
