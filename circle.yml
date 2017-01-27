@@ -2,6 +2,10 @@ machine:
   python:
     version: 3.5.2
 
+dependencies:
+  override:
+    - pip install -r dev-requirements.txt
+
 test:
   pre:
     - cp blog/settings.example.cfg blog/settings.cfg
