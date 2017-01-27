@@ -14,10 +14,14 @@ from flask import abort
 from flask import render_template
 from flask import flash
 from flask import make_response
+from flask.ext.cache import Cache
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
+cache = Cache(app, config={
+    'CACHE_TYPE': 'simple',
+    'CACHE_DEFAULT_TIMEOUT': 3600})
 app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
 
 app.config.update(dict(
@@ -78,6 +82,7 @@ def generate_password_command():
 
 
 @app.route('/')
+@cache.cached(timeout=300)
 def index():
     db = get_db()
     cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
@@ -90,6 +95,7 @@ def index():
 
 
 @app.route('/archive')
+@cache.cached()
 def archive():
     db = get_db()
     raw_years = db.execute("""
@@ -115,6 +121,7 @@ def archive():
 
 
 @app.route('/feed')
+@cache.cache()
 def gen_feed():
     db = get_db()
     cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
@@ -129,6 +136,7 @@ def gen_feed():
 
 
 @app.route('/<string:post_slug>')
+@cache.cached()
 def show_post(post_slug):
     db = get_db()
     post = db.execute(
@@ -206,6 +214,7 @@ def delete_post(id):
 
 
 @app.route('/tags')
+@cache.cached()
 def show_tags_list():
     db = get_db()
     tags = db.execute("""
@@ -217,6 +226,7 @@ def show_tags_list():
 
 
 @app.route('/tag/<string:tag>')
+@cache.cached()
 def show_posts_with_tag(tag):
     db = get_db()
     posts = db.execute("""
@@ -293,6 +303,7 @@ def logout():
     return redirect(url_for('index'))
 
 
+@cache.cached(timeout=300, key_prefix='tag')
 def find_tag(tag):
     db = get_db()
     cur = db.execute("SELECT id FROM tags WHERE tag = ?", [tag]).fetchone()
@@ -300,6 +311,7 @@ def find_tag(tag):
         return cur[0]
 
 
+@cache.cached(timeout=300, key_prefix='post_tags')
 def get_tags(post_id):
     db = get_db()
     cur = db.execute("""
