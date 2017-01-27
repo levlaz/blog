@@ -15,6 +15,7 @@
 
 		<nav>
 			<a href="{{ url_for('index') }}">Home</a>
+			<a href="{{ url_for('archive') }}">Archive</a>
 			<a href="{{ url_for('show_tags_list') }}">Tags</a>
 			<a href="{{ url_for('gen_feed') }}">RSS</a>
 			{% if not session.logged_in %}
@@ -25,7 +26,7 @@
 		</nav>
 
 		{% for message in get_flashed_messages() %}
-		
+
 		<span class="flash">{{ message }}</span>
 
 		{% endfor %}
@@ -39,14 +40,14 @@
 			<br />
 			<a class="cc" href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img class="cc" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" alt="Creative Commons License"/></a>
 			<br />
-			Running on <a href="https://github.com/levlaz/blog">levlaz/blog</a>. A simple blogging app written in Python and licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License v3</a>. 
+			Running on <a href="https://github.com/levlaz/blog">levlaz/blog</a>. A simple blogging app written in Python and licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License v3</a>.
 			<br />
 			<br />
 			</span>
-			
+
 			<a class="right" href="https://m.do.co/c/ffc7002f7299"><img alt="DO Shield" src="https://img.shields.io/badge/powered%20by-Digital%20Ocean-blue.svg"></a>
 		</footer>
-			
+
 	</body>
 </html>
 

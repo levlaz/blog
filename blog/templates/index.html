@@ -3,7 +3,7 @@
 {% block body %}
 
 	{% if session.logged_in %}
-	
+
 	<h2>Add New Post</h2>
 
 	{% if error %}
@@ -11,7 +11,7 @@
 		{{ error }}
 	</p>
 	{% endif %}
-	
+
 	<form action="{{ url_for('add_post') }}" method="POST">
 		<input type="text" name="title" placeholder="Post Title">
 		<br />
@@ -34,19 +34,19 @@
 
 	<p class="postDate">
 		{{ post.created_date }}
-		
+
 		][ Tags:
 		{% for tag in get_tags(post.id) %}
 			<a href="{{ url_for('show_posts_with_tag', tag=tag.tag) }}">{{ tag.tag }}</a>
 		{% endfor %}
 	</p>
-	
+
 	<div class="postText">
 		{{ post.text_compiled|safe }}
 
 		{% if session.logged_in %}
 			<p class="postActions">
-				<a href="{{ url_for('edit_post', id=post.id)}}">Edit</a>	
+				<a href="{{ url_for('edit_post', id=post.id)}}">Edit</a>
 				<a href="{{ url_for('delete_post', id=post.id)}}">Delete</a>
 			</p>
 		{% endif %}

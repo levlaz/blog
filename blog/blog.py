@@ -2,6 +2,8 @@ import os
 import sqlite3
 import markdown
 import datetime
+import pprint
+from collections import OrderedDict
 from slugify import slugify
 from flask import Flask
 from flask import request
@@ -26,7 +28,9 @@ app.config.update(dict(
 
 def connect_db():
     """Connects to Database"""
-    rv = sqlite3.connect(app.config['DATABASE'])
+    rv = sqlite3.connect(
+            app.config['DATABASE'],
+            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
     rv.row_factory = sqlite3.Row
     return rv
 
@@ -73,7 +77,7 @@ def generate_password_command():
 @app.route('/')
 def index():
     db = get_db()
-    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC")
+    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     return render_template(
             'index.html',
@@ -82,10 +86,34 @@ def index():
             form_title="Add New Post")
 
 
+@app.route('/archive')
+def archive():
+    db = get_db()
+    raw_years = db.execute("""
+        SELECT DISTINCT(strftime('%Y', created_date)) from posts \
+        ORDER BY created_date DESC
+        """).fetchall()
+
+    posts = OrderedDict()
+
+    for year in raw_years:
+        posts[year[0]] = {'posts': []}
+
+    raw_post = db.execute("""
+        SELECT slug, title, created_date as 'date [timestamp]' \
+        FROM posts ORDER BY created_date DESC \
+        """)
+
+    for post in raw_post:
+        posts[str(post['date'].year)]['posts'].append(dict(slug=post['slug'], post_title=post['title']))
+
+    return render_template('archive.html', posts=posts)
+
+
 @app.route('/feed')
 def gen_feed():
     db = get_db()
-    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 10")
+    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     feed = render_template(
             'rss.xml',

@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	<h2> Archive </h2>
+
+	<p> All the Hacking Notes since the beginning of time. </p>
+
+	{% for year in posts %}
+		<h3> {{ year }} </h3>
+
+		<ul>
+		{% for post in posts[year].posts %}
+			<li>
+				<a href="{{ url_for('show_post', post_slug=post.slug) }}">
+				{{ post.post_title }}
+				</a>
+			</li>
+		{% endfor %}
+		</ul>
+
+	{% endfor %}
+
+{% endblock %}
