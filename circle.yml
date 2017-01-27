@@ -2,6 +2,10 @@ machine:
   python:
     version: 3.5.2
 
+general:
+  artifacts:
+    - "htmlcov/"
+
 dependencies:
   override:
     - pip install -r dev-requirements.txt
@@ -11,3 +15,5 @@ test:
     - cp blog/settings.example.cfg blog/settings.cfg
   override:
     - export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
+  post:
+    - coverage html
