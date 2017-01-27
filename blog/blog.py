@@ -2,7 +2,6 @@ import os
 import sqlite3
 import markdown
 import datetime
-import pprint
 from collections import OrderedDict
 from slugify import slugify
 from flask import Flask
@@ -105,7 +104,8 @@ def archive():
         """)
 
     for post in raw_post:
-        posts[str(post['date'].year)]['posts'].append(dict(slug=post['slug'], post_title=post['title']))
+        posts[str(post['date'].year)]['posts'].append(
+                dict(slug=post['slug'], post_title=post['title']))
 
     return render_template('archive.html', posts=posts)
 
