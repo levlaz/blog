@@ -7,6 +7,20 @@ Lev's Hacking Notes Blog
 
 ## Development
 
+You can install all dependencies (including testing and dev-only dependencies) by running `pip install -r dev-requirements.txt`. I suggest using a [virtualenv](https://pypi.python.org/pypi/virtualenv) in order to not pollute your global python.
+
+### Coding Style
+
+This project follows the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guide for Python code. CI tests will fail if your code does not adhere to this spec. You can test to make sure that all of your code is PEP 8 compliant by running `flake8 blog` from the project root.
+
+### Running Tests
+
+This project aims to have a robust test suite and 100% code coverage. In order to run the existing tests you can run `export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py` from the project root.
+
+If you wish to test a single test from the tests/ directory then you can run `export BLOG_PATH=$(pwd) && python -m unittest tests/$SINGLE_FILE.py`
+
+If you add new code to this project, please write the corresponding unit and integration tests and ensure that they pass.
+
 ### Generating Documentation
 
 From the project root run `pydoc -w ./` to generate documentation for all python files. Then you can remove all of the tests and should move all of the newly generated html files to the docs/ folder.
