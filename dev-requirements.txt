@@ -1,0 +1,5 @@
+# Development Requirements 
+
+-r requirements.txt
+
+coverage
