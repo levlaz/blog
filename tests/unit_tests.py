@@ -19,15 +19,15 @@ class BlogUnitTestCase(unittest.TestCase):
         with app.app_context():
             db = get_db()
             assert isinstance(db, sqlite3.Connection)
-            
+
             def schema():
                 return db.execute("SELECT * FROM sqlite_master").fetchall()
 
             assert len(schema()) == 0
 
-            init = init_db()
-            
-            assert len(schema()) == 10
+            init = migrate_db()
+
+            assert len(schema()) == 11
 
 if __name__ == '__main__':
     unittest.main()

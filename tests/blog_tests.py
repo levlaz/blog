@@ -2,9 +2,10 @@ import os
 import sys
 import unittest
 import tempfile
+import sqlite3
 
 sys.path.insert(0, os.environ.get('BLOG_PATH'))
-from blog.blog import app, init_db
+from blog.blog import app, migrate_db
 
 class BlogTestCase(unittest.TestCase):
 
@@ -13,7 +14,7 @@ class BlogTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         self.app = app.test_client()
         with app.app_context():
-            init_db()
+            migrate_db()
 
     def tearDown(self):
         os.close(self.db_fd)
@@ -39,6 +40,20 @@ class BlogTestCase(unittest.TestCase):
         assert b'You were logged out' in rv.data
         rv = self.login('wrong-password')
         assert b'Invalid password' in rv.data
+
+    def test_unique_posts_tags(self):
+        rv = self.login('test')
+        rv = self.app.post('/add', data=dict(
+            title="Test Title",
+            text="This is some test text",
+            tags="test1, test2, test3"), follow_redirects=True)
+
+        with self.assertRaises(sqlite3.IntegrityError):
+            rv = self.app.post('/edit/1', data=dict(
+                title="Test Title",
+                text="New Text",
+                tags="test1, test2"), follow_redirects=True)
+
 
 if __name__ == '__main__':
     unittest.main()
