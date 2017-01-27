@@ -5,6 +5,7 @@ machine:
 general:
   artifacts:
     - "htmlcov/"
+    - "flake8.txt"
 
 dependencies:
   override:
@@ -16,4 +17,5 @@ test:
   override:
     - export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
   post:
+    - flake8 --output-file=flake8.txt --exit-zero -j 4 blog
     - coverage html

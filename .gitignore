@@ -8,3 +8,4 @@ env/
 settings.cfg
 .coverage
 htmlcov/
+flake8.txt
