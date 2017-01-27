@@ -3,7 +3,22 @@ Lev's Hacking Notes Blog
 
 [![CI](https://circleci.com/gh/levlaz/blog.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/levlaz/blog)
 
+levlaz/blog (for lack of a better name) is a simple, ugly, single user blogging application written in Python and Flask.
+
+## Table of Contents
+
+* [Features](#) <!-- TODO -->
+* [Installation](#installation)
+* [Deploying to Production](#) <!-- TODO -->
+* [Development](#development)
+
 ## Installation
+
+### Dependencies
+
+* Python 3.5.2
+* SQLite 3.11.0
+* Python modules listed in [`requirements.txt`](https://github.com/levlaz/blog/blob/master/requirements.txt)
 
 ## Development
 
