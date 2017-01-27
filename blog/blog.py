@@ -121,7 +121,7 @@ def archive():
 
 
 @app.route('/feed')
-@cache.cache()
+@cache.cached()
 def gen_feed():
     db = get_db()
     cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
