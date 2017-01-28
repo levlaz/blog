@@ -27,7 +27,7 @@ class BlogUnitTestCase(unittest.TestCase):
 
             init = migrate_db()
 
-            assert len(schema()) == 11
+            assert len(schema()) == 21
 
 if __name__ == '__main__':
     unittest.main()
