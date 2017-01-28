@@ -92,6 +92,7 @@ def index():
             get_tags=get_tags,
             form_title="Add New Post")
 
+
 @app.route('/search')
 def search():
     query = request.args.get('query')
