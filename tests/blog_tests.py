@@ -5,7 +5,7 @@ import tempfile
 import sqlite3
 
 sys.path.insert(0, os.environ.get('BLOG_PATH'))
-from blog.blog import app, migrate_db
+from blog.blog import app, migrate_db, cache
 
 class BlogTestCase(unittest.TestCase):
 
@@ -14,6 +14,7 @@ class BlogTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         self.app = app.test_client()
         with app.app_context():
+            cache.clear()
             migrate_db()
 
     def tearDown(self):
@@ -35,9 +36,10 @@ class BlogTestCase(unittest.TestCase):
 
     def test_login_logout(self):
         rv = self.login('test')
-        assert b'You were logged in' in rv.data
+        assert "You were logged in" in rv.get_data(as_text=True)
+        cache.clear()
         rv = self.logout()
-        assert b'You were logged out' in rv.data
+        assert 'You were logged out' in rv.get_data(as_text=True)
         rv = self.login('wrong-password')
         assert b'Invalid password' in rv.data
 

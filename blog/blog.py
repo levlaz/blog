@@ -14,7 +14,7 @@ from flask import abort
 from flask import render_template
 from flask import flash
 from flask import make_response
-from flask.ext.cache import Cache
+from flask_cache import Cache
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
