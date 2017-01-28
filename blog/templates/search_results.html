@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+	<h2> Search Results for {{ query }} </h2>
+
+	{% for post in results %}
+	<h3 class="searchResultHeader">
+		<a href="{{ url_for('show_post', post_slug=post['slug']) }}">
+		{{ post['title'] }}
+		</a>
+	</h3>
+	<p class="searchResultBody">
+		{{ post['text_raw']|truncate(200) }}
+	</p>
+	{% endfor %}
+
+{% endblock %}

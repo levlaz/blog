@@ -51,8 +51,8 @@ def migrate_db():
     db = get_db()
     dir = os.path.dirname(__file__)
     migrations_path = os.path.join(dir, 'migrations/')
-    migration_files = os.listdir(migrations_path)
-    for migration in migration_files:
+    migration_files = list(os.listdir(migrations_path))
+    for migration in sorted(migration_files):
         path = "migrations/{0}".format(migration)
         with app.open_resource(path, mode='r') as f:
             db.cursor().executescript(f.read())
@@ -82,7 +82,6 @@ def generate_password_command():
 
 
 @app.route('/')
-@cache.cached(timeout=300)
 def index():
     db = get_db()
     cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
@@ -92,6 +91,17 @@ def index():
             posts=posts,
             get_tags=get_tags,
             form_title="Add New Post")
+
+@app.route('/search')
+def search():
+    query = request.args.get('query')
+    db = get_db()
+    results = db.execute("""
+        SELECT fts.docid, p.slug, p.title, p.text_raw FROM full_text_search fts
+        JOIN posts p on p.id = fts.docid
+        WHERE full_text_search MATCH ?""", [query]).fetchall()
+
+    return render_template('search_results.html', query=query, results=results)
 
 
 @app.route('/archive')
@@ -303,7 +313,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-@cache.cached(timeout=300, key_prefix='tag')
 def find_tag(tag):
     db = get_db()
     cur = db.execute("SELECT id FROM tags WHERE tag = ?", [tag]).fetchone()
@@ -311,7 +320,6 @@ def find_tag(tag):
         return cur[0]
 
 
-@cache.cached(timeout=300, key_prefix='post_tags')
 def get_tags(post_id):
     db = get_db()
     cur = db.execute("""

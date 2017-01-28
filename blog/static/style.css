@@ -19,6 +19,10 @@ nav > a {
 	padding-right: 10px;
 }
 
+#searchForm {
+	margin-top: 15px;
+}
+
 .flash {
 	color: green;
 }
@@ -51,6 +55,7 @@ nav > a {
 }
 
 footer {
+	margin-top: 20px;
 	padding-top: 10px;
 	padding-bottom: 30px;
 }
@@ -71,6 +76,15 @@ footer {
 	border: dashed 1px grey;
 	padding: 5px;
 	width: 650px;
+}
+
+.searchResultHeader {
+	margin-bottom: 0;
+}
+
+.searchResultBody {
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 @media only screen and (max-device-width: 480px) {
