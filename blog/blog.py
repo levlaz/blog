@@ -187,18 +187,19 @@ def edit_post(id):
         db.commit()
 
         for tag in tags:
-            existing_id = find_tag(tag.strip())
-            if existing_id:
-                cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
-                    VALUES(?, ?)", [id, existing_id])
-                db.commit()
-            else:
-                cursor.execute(
-                        "INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
-                tag_id = cursor.lastrowid
-                cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
-                    VALUES(?, ?)", [id, tag_id])
-                db.commit()
+            if len(tag.strip()) != 0:
+                existing_id = find_tag(tag.strip())
+                if existing_id:
+                    cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                        VALUES(?, ?)", [id, existing_id])
+                    db.commit()
+                else:
+                    cursor.execute(
+                            "INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
+                    tag_id = cursor.lastrowid
+                    cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                        VALUES(?, ?)", [id, tag_id])
+                    db.commit()
 
         flash('Post updated')
         return redirect(url_for('show_post', post_slug=slug))
@@ -278,17 +279,18 @@ def add_post():
     db.commit()
 
     for tag in tags:
-        existing_id = find_tag(tag.strip())
-        if existing_id:
-            cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
-                VALUES(?, ?)", [post_id, existing_id])
-            db.commit()
-        else:
-            cursor.execute("INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
-            tag_id = cursor.lastrowid
-            cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
-                VALUES(?, ?)", [post_id, tag_id])
-            db.commit()
+        if len(tag.strip()) != 0:
+            existing_id = find_tag(tag.strip())
+            if existing_id:
+                cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                    VALUES(?, ?)", [post_id, existing_id])
+                db.commit()
+            else:
+                cursor.execute("INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
+                tag_id = cursor.lastrowid
+                cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
+                    VALUES(?, ?)", [post_id, tag_id])
+                db.commit()
 
     flash('New post added!')
     return redirect(url_for('index'))
