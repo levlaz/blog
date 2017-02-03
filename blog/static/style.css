@@ -19,6 +19,14 @@ nav > a {
 	padding-right: 10px;
 }
 
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
 #searchForm {
 	margin-top: 15px;
 }
