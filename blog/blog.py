@@ -25,7 +25,7 @@ cache = Cache(app, config={
 app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'blog.db'),
+    DATABASE=os.path.join('/tmp', 'blog.db'),
 ))
 
 

@@ -1,0 +1,11 @@
+version: '2'
+services:
+  app:
+    image: levlaz/blog:latest
+    environment:
+      - FLASK_APP blog/blog.py
+    ports:
+      - "80":"5000"
+    volumes:
+      - /tmp:/tmp
+    command: ["./scripts/run.sh"]

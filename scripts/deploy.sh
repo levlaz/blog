@@ -1,5 +1,7 @@
 #!/bin/bash
 
-ssh ubuntu@demo.levlaz.org 'docker pull levlaz/blog'
-ssh ubuntu@demo.levlaz.org 'docker stop blog && docker rm blog'
-ssh ubuntu@demo.levlaz.org 'docker run --name blog -d -p 80:5000 levlaz/blog'
+scp docker-compose.yml ubuntu@demo.levlaz.org:/var/www/blog
+
+ssh ubuntu@demo.levlaz.org 'cd /var/www/blog && docker-compose pull'
+ssh ubuntu@demo.levlaz.org 'cd /var/www/blog && docker-compose build'
+ssh ubuntu@demo.levlaz.org 'cd /var/www/blog && docker-compose up -d'
