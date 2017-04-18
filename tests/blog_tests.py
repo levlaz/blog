@@ -36,7 +36,7 @@ class BlogTestCase(unittest.TestCase):
         assert b'Billy Bob Blog' not in rv.data
 
     def test_login_logout(self):
-        rv = self.login('test')
+        rv = self.login('password')
         assert "You were logged in" in rv.get_data(as_text=True)
         cache.clear()
         rv = self.logout()
@@ -45,7 +45,7 @@ class BlogTestCase(unittest.TestCase):
         assert b'Invalid password' in rv.data
 
     def test_unique_posts_tags(self):
-        rv = self.login('test')
+        rv = self.login('password')
         rv = self.app.post('/add', data=dict(
             title="Test Title",
             text="This is some test text",
