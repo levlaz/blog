@@ -12,8 +12,6 @@ dependencies:
     - pip install -r dev-requirements.txt
 
 test:
-  pre:
-    - cp blog/settings.example.cfg blog/settings.cfg
   override:
     - export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
   post:
