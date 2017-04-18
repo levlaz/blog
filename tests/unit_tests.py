@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 import tempfile
+import xmlrunner
 
 sys.path.insert(0, os.environ.get('BLOG_PATH'))
 from blog.blog import *
@@ -30,5 +31,4 @@ class BlogUnitTestCase(unittest.TestCase):
             assert len(schema()) == 21
 
 if __name__ == '__main__':
-    unittest.main()
-
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))

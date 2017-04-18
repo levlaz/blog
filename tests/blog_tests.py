@@ -3,6 +3,7 @@ import sys
 import unittest
 import tempfile
 import sqlite3
+import xmlrunner
 
 sys.path.insert(0, os.environ.get('BLOG_PATH'))
 from blog.blog import app, migrate_db, cache
@@ -58,4 +59,4 @@ class BlogTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))

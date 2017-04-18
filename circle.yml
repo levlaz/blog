@@ -19,6 +19,8 @@ test:
   post:
     - flake8 --output-file=flake8.txt -j 4 blog
     - coverage html
+    - mkdir -p $CIRCLE_TEST_REPORTS/pytest/
+    - mv test-reports/*.xml $CIRCLE_TEST_REPORTS/pytest/
 
 deployment:
     master:

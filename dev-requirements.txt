@@ -1,6 +1,7 @@
-# Development Requirements 
+# Development Requirements
 
 -r requirements.txt
 
 coverage
 flake8
+unittest-xml-reporting
