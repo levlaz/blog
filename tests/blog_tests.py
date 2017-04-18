@@ -31,7 +31,7 @@ class BlogTestCase(unittest.TestCase):
 
     def test_empty(self):
         rv = self.app.get('/')
-        assert b'Lev\'s Hacking Notes' in rv.data
+        assert b'CircleCI Docker Demo' in rv.data
         assert b'Billy Bob Blog' not in rv.data
 
     def test_login_logout(self):
