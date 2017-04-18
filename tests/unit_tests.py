@@ -9,6 +9,9 @@ from blog.blog import *
 
 class BlogUnitTestCase(unittest.TestCase):
 
+    def test_failure(self):
+        assert ("I am a Failure" == True)
+
     def test_connect_db(self):
         db = connect_db()
         assert isinstance(db, sqlite3.Connection)
