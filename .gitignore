@@ -1,11 +1,10 @@
-.env 
+.env
 *.egg-info/
 env/
 *.swp
 *.swo
 *.pyc
 *.db
-settings.cfg
 .coverage
 htmlcov/
 flake8.txt
