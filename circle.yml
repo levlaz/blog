@@ -19,3 +19,13 @@ test:
   post:
     - flake8 --output-file=flake8.txt -j 4 blog
     - coverage html
+
+deployment:
+    master:
+        branch: master
+        commands:
+            - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+            - docker build -t levlaz/blog:$CIRCLE_SHA1 .
+            - docker tag levlaz/blog:$CIRCLE_SHA1 levlaz/blog:latest
+            - docker push levlaz/blog
+            - scripts/deploy.sh
