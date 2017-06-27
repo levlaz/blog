@@ -72,6 +72,10 @@ footer {
 	margin-top: 5px;
 }
 
+.about_software {
+	font-size: smaller;
+}
+
 .left {
 	float: left;
 }
@@ -84,6 +88,7 @@ footer {
 	border: dashed 1px grey;
 	padding: 5px;
 	width: 650px;
+	overflow: auto;
 }
 
 .searchResultHeader {
