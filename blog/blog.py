@@ -286,7 +286,8 @@ def add_post():
                     VALUES(?, ?)", [post_id, existing_id])
                 db.commit()
             else:
-                cursor.execute("INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
+                cursor.execute(
+                    "INSERT INTO tags (tag) VALUES(?)", [tag.strip()])
                 tag_id = cursor.lastrowid
                 cursor.execute("INSERT INTO posts_tags (post_id, tag_id) \
                     VALUES(?, ?)", [post_id, tag_id])
