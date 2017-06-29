@@ -33,7 +33,7 @@
 	</h2>
 
 	<p class="postDate">
-		{{ post.created_date }}
+		{{ post.created_date.strftime('%Y-%m-%d') }}
 
 		][ Tags:
 		{% for tag in get_tags(post.id) %}

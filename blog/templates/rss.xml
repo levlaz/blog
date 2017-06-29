@@ -3,9 +3,9 @@
 	xmlns:content="http://purl.org/rss/1.0/modules/content/"
 	>
 	<channel>
-		<title>Lev's Hacking Notes</title>
-		<link>https://dev.levlaz.org</link>
-		<description>Bits and Bobs about Hacking</description>
+		<title>levlaz</title>
+		<link>https://levlaz.org</link>
+		<description>Having The Best Day of My Life</description>
 		<language>en-us</language>
 		<pubDate> {{ gen_date.strftime('%a, %d %b %y %T') }} UTC </pubDate>
 		<lastBuildDate> {{ gen_date.strftime('%a, %d %b %y %T') }} </lastBuildDate>

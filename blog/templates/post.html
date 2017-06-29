@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-	<title>Lev's Hacking Notes | {{ post.title }} </title>
+	<title>levlaz | {{ post.title }} </title>
 {% endblock %}
 {% block body %}
 
@@ -10,16 +10,23 @@
 	</h2>
 
 	<p class="postDate">
-		{{ post.created_date }}
-		
+		{{ post.created_date.strftime('%Y-%m-%d') }}
+
 		Tags:
 		{% for tag in get_tags(post.id)  %}
 		<a href="{{ url_for('show_posts_with_tag', tag=tag.tag) }}">{{ tag.tag }}</a>
 		{% endfor %}
 	</p>
-	
+
 	<div class="postText">
 		{{ post.text_compiled|safe }}
+
+		{% if session.logged_in %}
+			<p class="postActions">
+				<a href="{{ url_for('edit_post', id=post.id)}}">Edit</a>
+				<a href="{{ url_for('delete_post', id=post.id)}}">Delete</a>
+			</p>
+		{% endif %}
 	</div>
 
 {% endblock %}
