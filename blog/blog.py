@@ -96,7 +96,7 @@ def index():
             form_title="Add New Post")
 
 
-@app.route('/search')
+@app.route('/search/')
 def search():
     query = request.args.get('query')
     db = get_db()
@@ -108,7 +108,7 @@ def search():
     return render_template('search_results.html', query=query, results=results)
 
 
-@app.route('/archive')
+@app.route('/archive/')
 @cache.cached()
 def archive():
     db = get_db()
@@ -136,7 +136,7 @@ def archive():
     return render_template('archive.html', posts=posts)
 
 
-@app.route('/feed')
+@app.route('/feed/')
 @cache.cached()
 def gen_feed():
     db = get_db()
@@ -154,7 +154,7 @@ def gen_feed():
     return response
 
 
-@app.route('/<string:post_slug>')
+@app.route('/<string:post_slug>/')
 @cache.cached()
 def show_post(post_slug):
     db = get_db()
@@ -168,7 +168,7 @@ def show_post(post_slug):
         abort(404)
 
 
-@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@app.route('/edit/<int:id>/', methods=['GET', 'POST'])
 def edit_post(id):
     if not session.get('logged_in'):
         abort(401)
@@ -224,7 +224,7 @@ def edit_post(id):
     return render_template('edit.html', post=post, tags=csv_tags)
 
 
-@app.route('/delete/<int:id>')
+@app.route('/delete/<int:id>/')
 def delete_post(id):
     if not session.get('logged_in'):
         abort(401)
@@ -236,7 +236,7 @@ def delete_post(id):
     return redirect(url_for('index'))
 
 
-@app.route('/tags')
+@app.route('/tags/')
 @cache.cached()
 def show_tags_list():
     db = get_db()
@@ -248,7 +248,7 @@ def show_tags_list():
     return render_template('tags_list.html', tags=tags)
 
 
-@app.route('/tag/<string:tag>')
+@app.route('/tag/<string:tag>/')
 @cache.cached()
 def show_posts_with_tag(tag):
     db = get_db()
