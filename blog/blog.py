@@ -84,7 +84,10 @@ def generate_password_command():
 @app.route('/')
 def index():
     db = get_db()
-    cur = db.execute("SELECT * FROM posts WHERE is_static_page != 0 ORDER BY created_date DESC LIMIT 25")
+    cur = db.execute(
+        "SELECT * FROM posts \
+        WHERE is_static_page != 0 \
+        ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     return render_template(
             'index.html',
@@ -137,7 +140,10 @@ def archive():
 @cache.cached()
 def gen_feed():
     db = get_db()
-    cur = db.execute("SELECT * FROM posts WHERE is_static_page != 0 ORDER BY created_date DESC LIMIT 25")
+    cur = db.execute(
+        "SELECT * FROM posts \
+        WHERE is_static_page != 0 \
+        ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     feed = render_template(
             'rss.xml',
@@ -285,7 +291,8 @@ def add_post():
     db.commit()
 
     if page:
-        cursor.execute("UPDATE posts SET is_static_page = 0 WHERE id = ?", (post_id,))
+        cursor.execute(
+            "UPDATE posts SET is_static_page = 0 WHERE id = ?", (post_id,))
         db.commit()
 
     for tag in tags:
@@ -352,7 +359,9 @@ def get_static_pages():
         """).fetchall()
     return cur
 
+
 app.jinja_env.globals.update(get_static_pages=get_static_pages)
+
 
 def verify_password(password):
     return check_password_hash(app.config['PASSWORD'], password)
