@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+	<title>levlaz | {{ post.title }} </title>
+{% endblock %}
+{% block body %}
+
+	<h2 class="postTitle">
+		<a href="{{ post.slug }}">{{ post.title }}</a>
+	</h2>
+
+	<div class="postText">
+		{{ post.text_compiled|safe }}
+
+		{% if session.logged_in %}
+			<p class="postActions">
+				<a href="{{ url_for('edit_post', id=post.id)}}">Edit</a>
+				<a href="{{ url_for('delete_post', id=post.id)}}">Delete</a>
+			</p>
+		{% endif %}
+	</div>
+
+{% endblock %}

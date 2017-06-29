@@ -18,7 +18,13 @@
 			<a href="{{ url_for('index') }}">Home</a>
 			<a href="{{ url_for('archive') }}">Archive</a>
 			<a href="{{ url_for('show_tags_list') }}">Tags</a>
+
+			{% for page in get_static_pages() %}
+				<a href="{{ url_for('show_post', post_slug=page.slug) }}"> {{ page.title }} </a>
+			{% endfor %}
+
 			<a href="{{ url_for('gen_feed') }}">RSS</a>
+
 			{% if not session.logged_in %}
 			<a href="{{ url_for('login') }}">Log In</a>
 			{% else %}

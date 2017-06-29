@@ -84,7 +84,7 @@ def generate_password_command():
 @app.route('/')
 def index():
     db = get_db()
-    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
+    cur = db.execute("SELECT * FROM posts WHERE is_static_page != 0 ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     return render_template(
             'index.html',
@@ -121,7 +121,9 @@ def archive():
 
     raw_post = db.execute("""
         SELECT slug, title, created_date as 'date [timestamp]' \
-        FROM posts ORDER BY created_date DESC \
+        FROM posts
+        WHERE is_static_page != 0
+        ORDER BY created_date DESC \
         """)
 
     for post in raw_post:
@@ -135,7 +137,7 @@ def archive():
 @cache.cached()
 def gen_feed():
     db = get_db()
-    cur = db.execute("SELECT * FROM posts ORDER BY created_date DESC LIMIT 25")
+    cur = db.execute("SELECT * FROM posts WHERE is_static_page != 0 ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     feed = render_template(
             'rss.xml',
@@ -152,7 +154,9 @@ def show_post(post_slug):
     db = get_db()
     post = db.execute(
         "SELECT * FROM posts WHERE slug = ?", [post_slug]).fetchone()
-    if post:
+    if (post['is_static_page'] == 0):
+        return render_template('page.html', post=post)
+    elif post:
         return render_template('post.html', post=post, get_tags=get_tags)
     else:
         abort(404)
@@ -273,11 +277,16 @@ def add_post():
                 'markdown.extensions.fenced_code',
                 'markdown.extensions.codehilite'])
     tags = request.form['tags'].split(',')
+    page = 'page' in request.form
 
     cursor.execute("INSERT INTO posts (title, slug, text_raw, text_compiled) \
         VALUES (?, ?, ?, ?)", [title, slug, text_raw, text_compiled])
     post_id = cursor.lastrowid
     db.commit()
+
+    if page:
+        cursor.execute("UPDATE posts SET is_static_page = 0 WHERE id = ?", (post_id,))
+        db.commit()
 
     for tag in tags:
         if len(tag.strip()) != 0:
@@ -334,6 +343,16 @@ def get_tags(post_id):
             WHERE p.id = ?""", [post_id]).fetchall()
     return cur
 
+
+def get_static_pages():
+    db = get_db()
+    cur = db.execute("""
+        SELECT * FROM posts
+        WHERE is_static_page = 0
+        """).fetchall()
+    return cur
+
+app.jinja_env.globals.update(get_static_pages=get_static_pages)
 
 def verify_password(password):
     return check_password_hash(app.config['PASSWORD'], password)
