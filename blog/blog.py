@@ -201,6 +201,7 @@ def edit_post(id):
                         VALUES(?, ?)", [id, tag_id])
                     db.commit()
 
+        cache.clear()
         flash('Post updated')
         return redirect(url_for('show_post', post_slug=slug))
 
