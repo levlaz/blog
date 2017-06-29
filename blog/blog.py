@@ -368,4 +368,5 @@ def verify_password(password):
 
 
 if __name__ == "__main__":
+    cache.clear()
     app.run()
