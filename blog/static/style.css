@@ -27,6 +27,13 @@ a:hover {
 	text-decoration: underline;
 }
 
+blockquote {
+	font-style: italic;
+	color: gray;
+	border-left: solid 2px lightgray;
+	padding-left: 15px;
+}
+
 #searchForm {
 	margin-top: 15px;
 }
