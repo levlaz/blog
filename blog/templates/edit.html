@@ -3,7 +3,7 @@
 {% block body %}
 
 	{% if session.logged_in %}
-	
+
 	<h2>Edit Post</h2>
 
 	{% if error %}
@@ -11,12 +11,12 @@
 		{{ error }}
 	</p>
 	{% endif %}
-	
+
 	<form action="{{ url_for('edit_post', id=post.id) }}" method="POST">
 		<input type="text" name="title" placeholder="Post Title" value="{{post.title}}">
 		<br />
 		<br />
-		<textarea name="text" rows=10 cols=40 placeholder="Post Body">{{ post.text_raw }}</textarea>
+		<textarea name="text" rows=20 cols=80 placeholder="Post Body">{{ post.text_raw }}</textarea>
 		<br />
 		<br />
 		<input type="text" name="tags" placeholder="Tags" value="{{tags}}">
