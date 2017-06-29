@@ -5,7 +5,7 @@ import tempfile
 import sqlite3
 
 sys.path.insert(0, os.environ.get('BLOG_PATH'))
-from blog.blog import app, migrate_db, cache
+from blog.blog import app, migrate_db, cache, get_static_pages
 
 class BlogTestCase(unittest.TestCase):
 
@@ -31,7 +31,7 @@ class BlogTestCase(unittest.TestCase):
 
     def test_empty(self):
         rv = self.app.get('/')
-        assert b'Lev\'s Hacking Notes' in rv.data
+        assert b'levlaz' in rv.data
         assert b'Billy Bob Blog' not in rv.data
 
     def test_login_logout(self):
@@ -55,6 +55,26 @@ class BlogTestCase(unittest.TestCase):
                 title="Test Title",
                 text="New Text",
                 tags="test1, test2"), follow_redirects=True)
+
+    def test_static_pages(self):
+        rv = self.login('test')
+        rv = self.app.post('/add', data=dict(
+            title="Test Title",
+            text="This is some test text",
+            tags="test1, test2, test3"), follow_redirects=True)
+        rv = self.app.post('/add', data=dict(
+            title="Static Page",
+            text="This is a Static Page",
+            tags="",
+            page="on"), follow_redirects=True)
+
+        rv = self.app.get('/edit/1', data=dict(
+            title="Test Title",
+            text="This is some test text",
+            tags="test1, test2, test3"), follow_redirects=True)
+
+        assert b'Test Title' in rv.data
+        assert b'Static Page' in rv.data
 
 
 if __name__ == '__main__':
