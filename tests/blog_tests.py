@@ -51,7 +51,7 @@ class BlogTestCase(unittest.TestCase):
             tags="test1, test2, test3"), follow_redirects=True)
 
         with self.assertRaises(sqlite3.IntegrityError):
-            rv = self.app.post('/edit/1', data=dict(
+            rv = self.app.post('/edit/1/', data=dict(
                 title="Test Title",
                 text="New Text",
                 tags="test1, test2"), follow_redirects=True)
@@ -68,7 +68,7 @@ class BlogTestCase(unittest.TestCase):
             tags="",
             page="on"), follow_redirects=True)
 
-        rv = self.app.get('/edit/1', data=dict(
+        rv = self.app.get('/edit/1/', data=dict(
             title="Test Title",
             text="This is some test text",
             tags="test1, test2, test3"), follow_redirects=True)
