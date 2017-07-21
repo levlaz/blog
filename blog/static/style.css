@@ -17,6 +17,10 @@ p > code {
 	color: darkred;
 }
 
+pre {
+	font-size: 13px;
+}
+
 nav {
 	text-align: center;
 }
