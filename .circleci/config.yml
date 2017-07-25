@@ -1,0 +1,15 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/blog
+    docker:
+      - image: circleci/python:3.5.2-browsers
+
+    steps:
+      - checkout
+      - run: pip install -r dev-requirements.txt
+      - run: cp blog/settings.example.cfg blog/settings.cfg
+      - run: export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
+      - run: flake8 --output-file=flake8.txt -j 4 blog
+      - run: coverage html 
