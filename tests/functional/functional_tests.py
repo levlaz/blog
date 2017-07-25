@@ -19,8 +19,8 @@ class FunctionalTestCase(unittest.TestCase):
         self.driver.quit()
 
     def test_home(self):
-        res = self.driver.get(self.baseURL)
-        print(res)
+        self.driver.get(self.baseURL)
+        print(self.driver)
         assert False
 
 
