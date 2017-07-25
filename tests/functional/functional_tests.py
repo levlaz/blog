@@ -20,7 +20,7 @@ class FunctionalTestCase(unittest.TestCase):
 
     def test_home(self):
         self.driver.get(self.baseURL)
-        print(self.driver)
+        print(dir(self.driver))
         assert False
 
 
