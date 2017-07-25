@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/blog
     docker:
-      - image: circleci/python:3.5.2-browsers
+      - image: circleci/python:3.5-browsers
 
     steps:
       - checkout
