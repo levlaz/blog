@@ -1,8 +1,8 @@
-import unittest
 import os
 import sys
+import tempfile
+import unittest
 
-from flask_testing import LiveServerTestCase
 from selenium import webdriver
 from urllib.request import urlopen
 
