@@ -27,6 +27,41 @@
 				<a href="{{ url_for('delete_post', id=post.id)}}">Delete</a>
 			</p>
 		{% endif %}
+
+		<div class="postComment">
+			<form action="{{ url_for('add_comment', id=post.id) }}" method="POST">
+				<input type="text" name="author" placeholder="Your Name">
+				<br />
+				<br />
+				<input type="text" name="email" placeholder="Your Email (optional)">
+				<br />
+				<br />
+				<input type="text" name="website" placeholder="Your Website (optional)">
+				<br />
+				<br />
+				<textarea name="comment_body" rows=20 cols=80 placeholder="Your Comment"></textarea>
+				<br />
+				<br />
+				<input type="submit" value="Add Comment">
+			</form>
+		</div>
+
+		<h3> Post Comments ({{ get_comment_count(post.id) }})</h3>
+		{% for comment in get_comments(post.id) %}
+			<p class="comment">
+				{% if not comment.author %}
+					<span class="commentAuthor">Anonymous</span>
+				{% else %}
+				<span class="commentAuthor">
+				<a target="blank" href="http://{{ comment.website }}">{{ comment.author }}</a>
+				</span>
+				{% endif %}
+				<span class="commentDate">{{ comment.created_date.strftime('%Y-%m-%d')}}</span>
+				<br />
+				{{ comment.comment_body|e }}
+			</p>
+		{% endfor %}
+
 	</div>
 
 {% endblock %}

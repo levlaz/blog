@@ -1,22 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+levlaz/blog
+
+Simple blogging engine written in python and Flask
+
+:copyright: (c) 2017 by Lev Lazinskiy
+:license: MIT, see LICENSE for more details.
+"""
+import datetime
 import os
 import sqlite3
-import markdown
-import datetime
 from collections import OrderedDict
-from slugify import slugify
-from flask import Flask
-from flask import request
-from flask import session
-from flask import g
-from flask import redirect
-from flask import url_for
-from flask import abort
-from flask import render_template
-from flask import flash
-from flask import make_response
+
+import markdown
+from flask import (Flask, abort, flash, g, make_response, redirect,
+                   render_template, request, session, url_for)
 from flask_cache import Cache
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
+from slugify import slugify
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 cache = Cache(app, config={
@@ -155,7 +156,6 @@ def gen_feed():
 
 
 @app.route('/<string:post_slug>/')
-@cache.cached()
 def show_post(post_slug):
     db = get_db()
     post = db.execute(
@@ -163,7 +163,12 @@ def show_post(post_slug):
     if (post['is_static_page'] == 0):
         return render_template('page.html', post=post)
     elif post:
-        return render_template('post.html', post=post, get_tags=get_tags)
+        return render_template(
+            'post.html',
+            post=post,
+            get_tags=get_tags,
+            get_comments=get_comments,
+            get_comment_count=get_comment_count)
     else:
         abort(404)
 
@@ -314,6 +319,26 @@ def add_post():
     return redirect(url_for('index'))
 
 
+@app.route('/comment/<int:id>', methods=['POST'])
+def add_comment(id):
+    """Add comment to a post"""
+    db = get_db()
+    cursor = db.cursor()
+
+    # Prepare comment
+    author = request.form['author']
+    email = request.form['email']
+    website = request.form['website']
+    comment_body = request.form['comment_body']
+
+    cursor.execute("INSERT INTO comments (post_id, author, email, website, comment_body) \
+        VALUES (?, ?, ?, ?, ?)", [id, author, email, website, comment_body])
+    db.commit()
+
+    flash("Your comment has been added, once it has been approved it will appear on this post page.")
+    return redirect(request.referrer)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -360,6 +385,24 @@ def get_static_pages():
         WHERE is_static_page = 0
         """).fetchall()
     return cur
+
+
+def get_comments(post_id):
+    """Get comments for a post."""
+    db = get_db()
+    cur = db.execute("""
+        SELECT * FROM comments
+        WHERE is_visible = 1 AND post_id = ?""", [post_id]).fetchall()
+    return cur
+
+
+def get_comment_count(post_id):
+    """Get count of comments for a post."""
+    db = get_db()
+    cur = db.execute("""
+        SELECT COUNT(id) FROM comments
+        WHERE is_visible = 1 AND post_id = ?""", [post_id]).fetchone()
+    return cur[0]
 
 
 app.jinja_env.globals.update(get_static_pages=get_static_pages)

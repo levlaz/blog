@@ -119,6 +119,22 @@ footer {
 	margin-bottom: 0;
 }
 
+.comment {
+	border: dashed 1px black;
+	padding: 5px;
+}
+
+.commentDate {
+	color: #999;
+	font-size: small;
+	bottom: 0;
+	right: 0;
+}
+
+.commentAuthor {
+	font-weight: bold;
+}
+
 @media only screen and (max-device-width: 480px) {
 
 	body {
