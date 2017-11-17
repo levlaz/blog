@@ -384,7 +384,7 @@ def add_comment(id):
 
     post = get_post(id)
 
-    subject = f"New comment on {post['title']}"
+    subject = "New comment on {0}".format(post['title'])
     token = generate_confirmation_token(comment_id)
 
     send_email(
