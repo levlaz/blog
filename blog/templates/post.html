@@ -28,25 +28,22 @@
 			</p>
 		{% endif %}
 
+		<h3> Comments ({{ get_comment_count(post.id) }})</h3>
+
 		<div class="postComment">
+			<span class="heading">Add Your Two Cents:</span>
 			<form action="{{ url_for('add_comment', id=post.id) }}" method="POST">
-				<input type="text" name="author" placeholder="Your Name">
-				<br />
+				<input type="text" name="author" placeholder="Your Name (optional)">
 				<br />
 				<input type="text" name="email" placeholder="Your Email (optional)">
-				<br />
-				<br />
 				<input type="text" name="website" placeholder="Your Website (optional)">
 				<br />
-				<br />
-				<textarea name="comment_body" rows=20 cols=80 placeholder="Your Comment"></textarea>
-				<br />
+				<textarea name="comment_body" rows=5 cols=80 placeholder="Your Comment" required></textarea>
 				<br />
 				<input type="submit" value="Add Comment">
 			</form>
 		</div>
 
-		<h3> Post Comments ({{ get_comment_count(post.id) }})</h3>
 		{% for comment in get_comments(post.id) %}
 			<p class="comment">
 				{% if not comment.author %}

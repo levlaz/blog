@@ -37,13 +37,12 @@ app.config.update(dict(
 mail.init_app(app)
 
 def connect_db():
-    """Connects to Database"""
+    """Connects to Database."""
     rv = sqlite3.connect(
-            app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+        app.config['DATABASE'],
+        detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
     rv.row_factory = sqlite3.Row
     return rv
-
 
 def get_db():
     """Opens new db connection if there is not an
@@ -53,11 +52,11 @@ def get_db():
         g.sqlite_db = connect_db()
     return g.sqlite_db
 
-
 def migrate_db():
+    """Run database migrations."""
     db = get_db()
-    dir = os.path.dirname(__file__)
-    migrations_path = os.path.join(dir, 'migrations/')
+    directory = os.path.dirname(__file__)
+    migrations_path = os.path.join(directory, 'migrations/')
     migration_files = list(os.listdir(migrations_path))
     for migration in sorted(migration_files):
         path = "migrations/{0}".format(migration)
@@ -66,11 +65,13 @@ def migrate_db():
 
 
 def generate_confirmation_token(comment_id, expiration=3600):
+    """Generate JWT token for approval."""
     s = Serializer(current_app.config['SECRET_KEY'], expiration)
     return s.dumps({'confirm': comment_id})
 
 
 def confirm(comment_id, token):
+    """Verify token."""
     s = Serializer(current_app.config['SECRET_KEY'])
     try:
         data = s.loads(token)
@@ -377,7 +378,6 @@ def add_comment(id):
     cursor.execute("INSERT INTO comments (post_id, author, email, website, comment_body) \
         VALUES (?, ?, ?, ?, ?)", [id, author, email, website, comment_body])
     comment_id = cursor.lastrowid
-    print(comment_id)
     db.commit()
 
     flash("Your comment has been added, once it has been approved it will appear on this post page.")

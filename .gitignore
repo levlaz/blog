@@ -1,4 +1,4 @@
-.env 
+.env
 *.egg-info/
 env/
 *.swp
@@ -9,3 +9,4 @@ settings.cfg
 .coverage
 htmlcov/
 flake8.txt
+.vscode/
