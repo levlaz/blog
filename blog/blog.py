@@ -11,24 +11,30 @@ import datetime
 import os
 import sqlite3
 from collections import OrderedDict
+from threading import Thread
 
 import markdown
-from flask import (Flask, abort, flash, g, make_response, redirect,
-                   render_template, request, session, url_for)
+from flask import (Flask, abort, current_app, flash, g, make_response,
+                   redirect, render_template, request, session, url_for)
 from flask_cache import Cache
+from flask_mail import Mail, Message
 from slugify import slugify
 from werkzeug.security import check_password_hash, generate_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 app = Flask(__name__)
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
     'CACHE_DEFAULT_TIMEOUT': 3600})
+mail = Mail()
+
 app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'blog.db'),
 ))
 
+mail.init_app(app)
 
 def connect_db():
     """Connects to Database"""
@@ -57,6 +63,44 @@ def migrate_db():
         path = "migrations/{0}".format(migration)
         with app.open_resource(path, mode='r') as f:
             db.cursor().executescript(f.read())
+
+
+def generate_confirmation_token(comment_id, expiration=3600):
+    s = Serializer(current_app.config['SECRET_KEY'], expiration)
+    return s.dumps({'confirm': comment_id})
+
+
+def confirm(comment_id, token):
+    s = Serializer(current_app.config['SECRET_KEY'])
+    try:
+        data = s.loads(token)
+    except:
+        return False
+    if data.get('confirm') != int(comment_id):
+        return False
+    return True
+
+
+# Email Functions
+def send_async_email(app, msg):
+    """Send Mail in App Context
+
+    Args:
+        app: current flask app
+        msg: the mail message
+    """
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_email(to, subject, template, **kwargs):
+    """Send email message on a new thread"""
+    app = current_app._get_current_object()
+    msg = Message(subject, recipients=[to])
+    msg.body = render_template(template, **kwargs)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    return thr
 
 
 @app.teardown_appcontext
@@ -224,7 +268,6 @@ def edit_post(id):
     tags = get_tags(post[0])
     csv_tags = ""
     for tag in tags:
-        print(dir(tag))
         csv_tags.join("{0},".format(tag))
     return render_template('edit.html', post=post, tags=csv_tags)
 
@@ -333,9 +376,27 @@ def add_comment(id):
 
     cursor.execute("INSERT INTO comments (post_id, author, email, website, comment_body) \
         VALUES (?, ?, ?, ?, ?)", [id, author, email, website, comment_body])
+    comment_id = cursor.lastrowid
+    print(comment_id)
     db.commit()
 
     flash("Your comment has been added, once it has been approved it will appear on this post page.")
+
+    post = get_post(id)
+
+    subject = f"New comment on {post['title']}"
+    token = generate_confirmation_token(comment_id)
+
+    send_email(
+        app.config['ADMIN_EMAIL'],
+        subject,
+        'mail/comment',
+        post = post['title'],
+        author = author,
+        body = comment_body,
+        comment_id = comment_id,
+        token=token)
+
     return redirect(request.referrer)
 
 
@@ -361,12 +422,34 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/approve_comment/<comment_id>/<token>')
+def approve_comment(comment_id, token):
+    if confirm(comment_id, token):
+        db = get_db()
+        cur = db.execute("""
+            UPDATE comments
+            SET is_visible=1
+            WHERE id = ?""", [comment_id])
+        db.commit()
+        flash('Comment approved')
+        return redirect(url_for('index'))
+    else:
+        flash('The confirmation link is invalid or has expired.')
+    return redirect(url_for('index'))
+
+
 def find_tag(tag):
     db = get_db()
     cur = db.execute("SELECT id FROM tags WHERE tag = ?", [tag]).fetchone()
     if cur:
         return cur[0]
 
+def get_post(post_id):
+    db = get_db()
+    cur = db.execute("""
+        SELECT * FROM posts
+        WHERE posts.id = ?""", [post_id]).fetchone()
+    return cur
 
 def get_tags(post_id):
     db = get_db()
