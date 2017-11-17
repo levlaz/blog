@@ -31,7 +31,7 @@ jobs:
             export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
             # export BLOG_PATH=$(pwd) && flask run &
             # export BLOG_PATH=$(pwd) && python -m unittest tests/functional/**.py
-            flake8 --output-file=flake8.txt -j 4 blog
+            # flake8 --output-file=flake8.txt -j 4 blog
             coverage html
 
       - store_artifacts:
