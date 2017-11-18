@@ -1,10 +1,11 @@
 import os
 import sys
-import unittest
 import tempfile
+import unittest
+
+from blog.blog import *
 
 sys.path.insert(0, os.environ.get('BLOG_PATH'))
-from blog.blog import *
 
 class BlogUnitTestCase(unittest.TestCase):
 
@@ -27,17 +28,16 @@ class BlogUnitTestCase(unittest.TestCase):
 
             init = migrate_db()
 
-            assert len(schema()) == 21
+            assert len(schema()) == 22
 
     def test_get_static_pages(self):
-        assert len(get_static_pages()) == 0
-
         self.db, app.config['DATABASE'] = tempfile.mkstemp()
         app.config['TESTING'] = True
         self.app = app.test_client()
         with app.app_context():
             migrate_db()
             db = get_db()
+            assert len(get_static_pages()) == 0
             cur = db.cursor()
             cur.execute("""
                 INSERT INTO posts (title, slug, text_raw, text_compiled, is_static_page) \
@@ -80,4 +80,3 @@ class BlogUnitTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

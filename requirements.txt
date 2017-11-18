@@ -1,5 +1,6 @@
-flask==0.12
+flask==0.12.2
 Flask-Cache==0.13.1
-python-slugify==1.2.1
-markdown==2.6.7
+python-slugify==1.2.4
+markdown==2.6.9
 Pygments==2.2.0
+Flask-Mail==0.9.1

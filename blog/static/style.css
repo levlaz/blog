@@ -119,6 +119,46 @@ footer {
 	margin-bottom: 0;
 }
 
+.postComment {
+	border: solid 1px grey;
+	padding: 10px;
+}
+
+.heading {
+	font-weight: bold;
+}
+
+.commentsContainer {
+	border: solid 1px red;
+	padding: 10px;
+}
+
+.comment {
+	border: dashed 1px black;
+	padding: 5px;
+}
+
+.notify {
+	font-size: small;
+}
+
+.commentDate {
+	color: #999;
+	font-size: small;
+	bottom: 0;
+	right: 0;
+}
+
+.commentAuthor {
+	font-weight: bold;
+}
+
+.commentChild {
+	padding-left: 30px;
+	border-left: solid 1px lightgrey;
+	border-bottom: solid 1px grey;
+}
+
 @media only screen and (max-device-width: 480px) {
 
 	body {

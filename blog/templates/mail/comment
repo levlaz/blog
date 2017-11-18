@@ -1,0 +1,8 @@
+New comment on {{ post }} from {{ author }}.
+============================================
+
+{{ body }}
+
+Click the link below to approve:
+
+{{ url_for('approve_comment', comment_id=comment_id, token=token, _external=True )}}

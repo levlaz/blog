@@ -27,6 +27,49 @@
 				<a href="{{ url_for('delete_post', id=post.id)}}">Delete</a>
 			</p>
 		{% endif %}
+
+		<h3> Comments ({{ get_comment_count(post.id) }})</h3>
+
+		<div class="postComment">
+			<span class="heading">Add Your Two Cents:</span>
+			<form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+				<input type="text" name="author" placeholder="Your Name (optional)">
+				<br />
+				<input type="text" name="email" placeholder="Your Email (optional)">
+				<input type="text" name="website" placeholder="Your Website (optional)">
+				<br />
+				<textarea name="comment_body" rows=5 cols=80 placeholder="Your Comment" required></textarea>
+				<br />
+				<input type="submit" value="Add Comment">
+			</form>
+		</div>
+
+		{%- for comment in get_comments(post.id) recursive %}
+
+			<p class="comment">
+				{% if not comment.author %}
+					<span class="commentAuthor">Anonymous</span>
+				{% else %}
+				<span class="commentAuthor">
+				<a target="blank" href="http://{{ comment.website }}">{{ comment.author }}</a>
+				</span>
+				{% endif %}
+				<span class="commentDate">{{ comment.created_date.strftime('%Y-%m-%d')}}</span>
+				<br />
+				{{ comment.comment_body|e }}
+				<br />
+				<button class="replyButton" postId="{{ post.id }}" commentId="{{ comment.id }}">reply</button>
+
+				{%- if get_comment_children(comment.id) -%}
+					<div class="commentChild">
+					{{ loop(get_comment_children(comment.id)) }}
+					</div>
+				{%- endif %}
+			</p>
+
+		{%- endfor %}
+
 	</div>
 
+	<script src="{{ url_for('static', filename='js/comment.js') }}"></script>
 {% endblock %}
