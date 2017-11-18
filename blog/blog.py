@@ -213,7 +213,8 @@ def show_post(post_slug):
             post=post,
             get_tags=get_tags,
             get_comments=get_comments,
-            get_comment_count=get_comment_count)
+            get_comment_count=get_comment_count,
+            get_comment_children=get_comment_children)
     else:
         abort(404)
 
@@ -362,9 +363,9 @@ def add_post():
     flash('New post added!')
     return redirect(url_for('index'))
 
-
-@app.route('/comment/<int:id>', methods=['POST'])
-def add_comment(id):
+@app.route('/comment/<int:post_id>', methods=['POST'])
+@app.route('/comment/<int:post_id>/<int:comment_id>', methods=['POST'])
+def add_comment(post_id, comment_id=None):
     """Add comment to a post"""
     db = get_db()
     cursor = db.cursor()
@@ -374,15 +375,21 @@ def add_comment(id):
     email = request.form['email']
     website = request.form['website']
     comment_body = request.form['comment_body']
+    notify = 'notify' in request.form
 
-    cursor.execute("INSERT INTO comments (post_id, author, email, website, comment_body) \
-        VALUES (?, ?, ?, ?, ?)", [id, author, email, website, comment_body])
+    if comment_id is not None:
+        cursor.execute("INSERT INTO comments (post_id, parent_id, author, email, website, comment_body) \
+            VALUES (?, ?, ?, ?, ?, ?)", [post_id, comment_id, author, email, website, comment_body])
+    else:
+        cursor.execute("INSERT INTO comments (post_id, author, email, website, comment_body) \
+            VALUES (?, ?, ?, ?, ?)", [post_id, author, email, website, comment_body])
+
     comment_id = cursor.lastrowid
     db.commit()
 
     flash("Your comment has been added, once it has been approved it will appear on this post page.")
 
-    post = get_post(id)
+    post = get_post(post_id)
 
     subject = "New comment on {0}".format(post['title'])
     token = generate_confirmation_token(comment_id)
@@ -475,7 +482,16 @@ def get_comments(post_id):
     db = get_db()
     cur = db.execute("""
         SELECT * FROM comments
-        WHERE is_visible = 1 AND post_id = ?""", [post_id]).fetchall()
+        WHERE is_visible = 1 AND parent_id is NULL AND post_id = ?""", [post_id]).fetchall()
+    return cur
+
+
+def get_comment_children(comment_id):
+    """Get comments for a comment."""
+    db = get_db()
+    cur = db.execute("""
+        SELECT * FROM comments
+        WHERE is_visible = 1 AND parent_id = ?""", [comment_id]).fetchall()
     return cur
 
 

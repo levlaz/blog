@@ -32,7 +32,7 @@
 
 		<div class="postComment">
 			<span class="heading">Add Your Two Cents:</span>
-			<form action="{{ url_for('add_comment', id=post.id) }}" method="POST">
+			<form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
 				<input type="text" name="author" placeholder="Your Name (optional)">
 				<br />
 				<input type="text" name="email" placeholder="Your Email (optional)">
@@ -44,7 +44,8 @@
 			</form>
 		</div>
 
-		{% for comment in get_comments(post.id) %}
+		{%- for comment in get_comments(post.id) recursive %}
+
 			<p class="comment">
 				{% if not comment.author %}
 					<span class="commentAuthor">Anonymous</span>
@@ -56,9 +57,19 @@
 				<span class="commentDate">{{ comment.created_date.strftime('%Y-%m-%d')}}</span>
 				<br />
 				{{ comment.comment_body|e }}
+				<br />
+				<button class="replyButton" postId="{{ post.id }}" commentId="{{ comment.id }}">reply</button>
+
+				{%- if get_comment_children(comment.id) -%}
+					<div class="commentChild">
+					{{ loop(get_comment_children(comment.id)) }}
+					</div>
+				{%- endif %}
 			</p>
-		{% endfor %}
+
+		{%- endfor %}
 
 	</div>
 
+	<script src="{{ url_for('static', filename='js/comment.js') }}"></script>
 {% endblock %}
