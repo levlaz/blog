@@ -1,6 +1,7 @@
 .env
 *.egg-info/
 env/
+venv/
 *.swp
 *.swo
 *.pyc

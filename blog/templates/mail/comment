@@ -6,3 +6,7 @@ New comment on {{ post }} from {{ author }}.
 Click the link below to approve:
 
 {{ url_for('approve_comment', comment_id=comment_id, token=token, _external=True )}}
+
+Or click on the link below to mark it as spam:
+
+{{ url_for('mark_spam', comment_id=comment_id, token=token, _external=True )}}
