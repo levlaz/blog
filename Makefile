@@ -8,7 +8,4 @@ shell:
 	export FLASK_APP=blog/blog.py && export FLASK_DEBUG=1 && flask shell
 
 dev:
-	export FLASK_APP=blog/blog.py
-	export FLASK_DEBUG=1
-	flask migrate
-	flask run
+	export FLASK_APP=blog/blog.py && export FLASK_DEBUG=1 && flask migrate && flask run
