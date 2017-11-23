@@ -18,6 +18,7 @@ from flask import (Flask, abort, current_app, flash, g, make_response,
                    redirect, render_template, request, session, url_for)
 from flask_cache import Cache
 from flask_mail import Mail, Message
+from flask_sqlalchemy import SQLAlchemy
 from slugify import slugify
 from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -27,14 +28,19 @@ cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
     'CACHE_DEFAULT_TIMEOUT': 3600})
 mail = Mail()
+db = SQLAlchemy()
 
 app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'blog.db'),
+    SQLALCHEMY_DATABASE_URI="sqlite:///blog.db"
 ))
 
 mail.init_app(app)
+db.init_app(app)
+
+from blog.models import Post, Comment
 
 def connect_db():
     """Connects to Database."""
@@ -136,10 +142,44 @@ def index():
         ORDER BY created_date DESC LIMIT 25")
     posts = cur.fetchall()
     return render_template(
-            'index.html',
-            posts=posts,
-            get_tags=get_tags,
-            form_title="Add New Post")
+        'index.html',
+        posts=posts,
+        get_tags=get_tags,
+        form_title="Add New Post")
+
+
+@app.route('/admin/')
+def admin():
+    if not session.get('logged_in'):
+        abort(401)
+
+    return render_template(
+        'admin.html',
+        comments=Comment.query.filter_by(is_visible=False, is_spam=False).all(),
+        )
+
+
+@app.route('/admin/comments/<filter>')
+def admin_comments(filter):
+
+    if not session.get('logged_in'):
+        abort(401)
+
+    if filter == 'all':
+        return render_template(
+            'admin/comments.html',
+            comments=Comment.query.all(),
+            )
+    if filter == 'approved':
+        return render_template(
+            'admin/comments.html',
+            comments=Comment.query.filter_by(is_visible=True).all(),
+            )
+    if filter == 'spam':
+        return render_template(
+            'admin/comments.html',
+            comments=Comment.query.filter_by(is_spam=True).all(),
+            )
 
 
 @app.route('/search/')
@@ -428,21 +468,58 @@ def logout():
     cache.clear()
     return redirect(url_for('index'))
 
-
+@app.route('/approve_comment/<comment_id>')
 @app.route('/approve_comment/<comment_id>/<token>')
-def approve_comment(comment_id, token):
-    if confirm(comment_id, token):
-        db = get_db()
-        cur = db.execute("""
-            UPDATE comments
-            SET is_visible=1
-            WHERE id = ?""", [comment_id])
-        db.commit()
-        flash('Comment approved')
-        return redirect(url_for('index'))
+def approve_comment(comment_id, token=None):
+    from blog.blog import db
+    comment = Comment.query.get(comment_id)
+
+    if token:
+        if confirm(comment_id, token):
+            comment.is_visible = True
+            db.session.add(comment)
+            db.session.commit()
+            flash('Comment approved')
+            return redirect(url_for('show_post', post_slug=comment.post.slug))
+        else:
+            flash('The confirmation link is invalid or has expired.')
+        return redirect(url_for('show_post', post_slug=comment.post.slug))
+
+    if not session.get('logged_in'):
+        abort(401)
     else:
-        flash('The confirmation link is invalid or has expired.')
-    return redirect(url_for('index'))
+        comment.is_visible = True
+        db.session.add(comment)
+        db.session.commit()
+        flash('Comment approved')
+        return redirect(url_for('show_post', post_slug=comment.post.slug))
+
+
+@app.route('/mark_spam/<comment_id>')
+@app.route('/mark_spam/<comment_id>/<token>')
+def mark_spam(comment_id, token=None):
+    from blog.blog import db
+    comment = Comment.query.get(comment_id)
+
+    if token:
+        if confirm(comment_id, token):
+            comment.is_spam = True
+            db.session.add(comment)
+            db.session.commit()
+            flash('Comment marked as spam.')
+            return redirect(url_for('show_post', post_slug=comment.post.slug))
+        else:
+            flash('The confirmation link is invalid or has expired.')
+        return redirect(url_for('show_post', post_slug=comment.post.slug))
+
+    if not session.get('logged_in'):
+        abort(401)
+    else:
+        comment.is_spam = True
+        db.session.add(comment)
+        db.session.commit()
+        flash('Comment marked as spam.')
+        return redirect(url_for('show_post', post_slug=comment.post.slug))
 
 
 def find_tag(tag):

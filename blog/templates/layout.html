@@ -1,13 +1,15 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		{% block title %}
-		<title>levlaz</title>
+		{% block head %}
+			{% block title %}
+			<title>levlaz</title>
+			{% endblock %}
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+			<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+			<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
 		{% endblock %}
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
-		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-		<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
 	</head>
 
 	<body>
@@ -29,6 +31,7 @@
 			<a href="{{ url_for('login') }}">Log In</a>
 			{% else %}
 			<a href="{{ url_for('logout') }}">Log Out</a>
+			<a href="{{ url_for('admin') }}">Admin</a>
 			{% endif %}
 
 			<form id="searchForm" action="/search" method="get">
