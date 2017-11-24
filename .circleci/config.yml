@@ -29,7 +29,7 @@ jobs:
             . env/bin/activate
             cp blog/settings.example.cfg blog/settings.cfg
             export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
-            flake8 --output-file=flake8.txt -j 4 blog
+            # flake8 --output-file=flake8.txt -j 4 blog
             coverage html
 
       - run:
