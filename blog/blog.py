@@ -492,7 +492,7 @@ def approve_comment(comment_id, token=None):
         db.session.add(comment)
         db.session.commit()
         flash('Comment approved')
-        return redirect(url_for('show_post', post_slug=comment.post.slug))
+        return redirect(request.referrer)
 
 
 @app.route('/mark_spam/<comment_id>')
@@ -519,7 +519,7 @@ def mark_spam(comment_id, token=None):
         db.session.add(comment)
         db.session.commit()
         flash('Comment marked as spam.')
-        return redirect(url_for('show_post', post_slug=comment.post.slug))
+        return redirect(request.referrer)
 
 
 def find_tag(tag):
