@@ -51,7 +51,7 @@
 					<span class="commentAuthor">Anonymous</span>
 				{% else %}
 				<span class="commentAuthor">
-				<a target="blank" href="http://{{ comment.website }}">{{ comment.author }}</a>
+				<a target="blank" href="{{ comment.website }}">{{ comment.author }}</a>
 				</span>
 				{% endif %}
 				<span class="commentDate">{{ comment.created_date.strftime('%Y-%m-%d')}}</span>
