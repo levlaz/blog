@@ -42,6 +42,7 @@ db.init_app(app)
 
 from blog.models import Post, Comment
 
+
 def connect_db():
     """Connects to Database."""
     rv = sqlite3.connect(
@@ -50,6 +51,7 @@ def connect_db():
     rv.row_factory = sqlite3.Row
     return rv
 
+
 def get_db():
     """Opens new db connection if there is not an
     existing one for the current app ctx.
@@ -57,6 +59,7 @@ def get_db():
     if not hasattr(g, 'sqlite_db'):
         g.sqlite_db = connect_db()
     return g.sqlite_db
+
 
 def migrate_db():
     """Run database migrations."""
@@ -403,6 +406,7 @@ def add_post():
     flash('New post added!')
     return redirect(url_for('index'))
 
+
 @app.route('/comment/<int:post_id>', methods=['POST'])
 @app.route('/comment/<int:post_id>/<int:comment_id>', methods=['POST'])
 def add_comment(post_id, comment_id=None):
@@ -468,6 +472,7 @@ def logout():
     cache.clear()
     return redirect(url_for('index'))
 
+
 @app.route('/approve_comment/<comment_id>')
 @app.route('/approve_comment/<comment_id>/<token>')
 def approve_comment(comment_id, token=None):
@@ -528,12 +533,14 @@ def find_tag(tag):
     if cur:
         return cur[0]
 
+
 def get_post(post_id):
     db = get_db()
     cur = db.execute("""
         SELECT * FROM posts
         WHERE posts.id = ?""", [post_id]).fetchone()
     return cur
+
 
 def get_tags(post_id):
     db = get_db()
