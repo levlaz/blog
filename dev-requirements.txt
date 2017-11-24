@@ -6,3 +6,4 @@ coverage
 flake8
 selenium
 pylint
+pyvirtualdisplay
