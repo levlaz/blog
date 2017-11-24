@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: blog-v1-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}
+          key: blog-v1-{{ .Branch }}
 
       - run:
           name: install python deps
@@ -19,7 +19,7 @@ jobs:
             pip install -r dev-requirements.txt
 
       - save_cache:
-          key: blog-v1-{{ .Branch }}
+          key: blog-v1-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}
           paths:
             - env
 
@@ -30,7 +30,6 @@ jobs:
             cp blog/settings.example.cfg blog/settings.cfg
             export BLOG_PATH=$(pwd) && coverage run --source blog -m unittest tests/**.py
             # flake8 --output-file=flake8.txt -j 4 blog
-            coverage html
 
       - run:
           name: start app in background
@@ -43,7 +42,8 @@ jobs:
           name: run functional tests
           command: |
             . env/bin/activate
-            python -m unittest tests/functional/functional_tests.py
+            coverage run --source blog -m unittest tests/functional/functional_tests.py
+            coverage html
 
       - store_artifacts:
           path: htmlcov
