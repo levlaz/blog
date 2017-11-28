@@ -113,6 +113,17 @@ def send_email(to, subject, template, **kwargs):
     return thr
 
 
+def check_spam(comment):
+
+    SPAM_WORDS = [
+        'viagra',
+    ]
+
+    for word in SPAM_WORDS:
+        if word in comment:
+            return True
+
+
 @app.teardown_appcontext
 def close_db(error):
     """Closes db at the end of request."""
@@ -420,6 +431,9 @@ def add_comment(post_id, comment_id=None):
     website = request.form['website']
     comment_body = request.form['comment_body']
     notify = 'notify' in request.form
+
+    if check_spam(comment_body):
+        return render_template('spam/spammers.html')
 
     if comment_id is not None:
         cursor.execute("INSERT INTO comments (post_id, parent_id, author, email, website, comment_body) \
