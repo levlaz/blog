@@ -73,7 +73,7 @@ def migrate_db():
             db.cursor().executescript(f.read())
 
 
-def generate_confirmation_token(comment_id, expiration=3600):
+def generate_confirmation_token(comment_id, expiration=120000):
     """Generate JWT token for approval."""
     s = Serializer(current_app.config['SECRET_KEY'], expiration)
     return s.dumps({'confirm': comment_id})
