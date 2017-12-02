@@ -117,10 +117,11 @@ def check_spam(comment):
 
     SPAM_WORDS = [
         'viagra',
+        'first page of google',
     ]
 
     for word in SPAM_WORDS:
-        if word in comment:
+        if word in comment.lower():
             return True
 
 
