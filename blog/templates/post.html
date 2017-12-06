@@ -51,7 +51,13 @@
 					<span class="commentAuthor">Anonymous</span>
 				{% else %}
 				<span class="commentAuthor">
-				<a target="blank" href="{{ comment.website }}">{{ comment.author }}</a>
+
+				{% if comment.is_from_admin %}
+				<a target="blank" style="color:green" href="http://{{ comment.website }}">{{ comment.author }} [OP]</a>
+				{% else %}
+				<a target="blank" href="http://{{ comment.website }}">{{ comment.author }}</a>
+				{% endif %}
+
 				</span>
 				{% endif %}
 				<span class="commentDate">{{ comment.created_date.strftime('%Y-%m-%d')}}</span>

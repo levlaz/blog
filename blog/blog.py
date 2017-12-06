@@ -63,14 +63,27 @@ def get_db():
 
 def migrate_db():
     """Run database migrations."""
+
+    def get_script_version(path):
+        return int(path.split('_')[0].split('/')[1])
+
     db = get_db()
+    current_version = db.cursor().execute('pragma user_version').fetchone()[0]
+
     directory = os.path.dirname(__file__)
     migrations_path = os.path.join(directory, 'migrations/')
     migration_files = list(os.listdir(migrations_path))
     for migration in sorted(migration_files):
         path = "migrations/{0}".format(migration)
-        with app.open_resource(path, mode='r') as f:
-            db.cursor().executescript(f.read())
+        migration_version = get_script_version(path)
+
+        if migration_version > current_version:
+            print("applying migration {0}".format(migration_version))
+            with app.open_resource(path, mode='r') as f:
+                 db.cursor().executescript(f.read())
+                 print("database now at version {0}".format(migration_version))
+        else:
+            print("migration {0} already applied".format(migration_version))
 
 
 def generate_confirmation_token(comment_id, expiration=120000):
@@ -426,12 +439,20 @@ def add_comment(post_id, comment_id=None):
     db = get_db()
     cursor = db.cursor()
 
-    # Prepare comment
-    author = request.form['author']
-    email = request.form['email']
-    website = request.form['website']
-    comment_body = request.form['comment_body']
-    notify = 'notify' in request.form
+    if session.get('logged_in'):
+        # Prepare comment
+        author = app.config['ADMIN_NAME']
+        email = app.config['ADMIN_EMAIL']
+        website = app.config['SITE_URL']
+        comment_body = request.form['comment_body']
+        notify = 'notify' in request.form
+    else:
+        # Prepare comment
+        author = request.form['author']
+        email = request.form['email']
+        website = request.form['website']
+        comment_body = request.form['comment_body']
+        notify = 'notify' in request.form
 
     if check_spam(comment_body):
         return render_template('spam/spammers.html')
@@ -445,6 +466,18 @@ def add_comment(post_id, comment_id=None):
 
     comment_id = cursor.lastrowid
     db.commit()
+
+    if session.get('logged_in'):
+        from blog.blog import db
+
+        comment = Comment.query.get(comment_id)
+        comment.is_visible = True
+        comment.is_from_admin = True
+        db.session.add(comment)
+        db.session.commit()
+
+        flash("Comment added.")
+        return redirect(request.referrer)
 
     flash("Your comment has been added, once it has been approved it will appear on this post page.")
 

@@ -31,6 +31,7 @@ class Comment(db.Model):
     comment_body = db.Column(db.Text, nullable=False)
     is_visible = db.Column(db.Boolean, default=False)
     is_spam = db.Column(db.Boolean, default=False)
+    is_from_admin = db.Column(db.Boolean, default=False)
     created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))

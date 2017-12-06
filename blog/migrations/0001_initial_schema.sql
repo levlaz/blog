@@ -65,4 +65,4 @@ CREATE TABLE IF NOT EXISTS  posts_tags (
 	FOREIGN KEY(tag_id) REFERENCES tags(id)
 );
 
-
+PRAGMA user_version=1;

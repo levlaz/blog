@@ -37,3 +37,4 @@ CREATE TRIGGER IF NOT EXISTS trigger_delete_full_text AFTER DELETE ON posts
 		WHERE docid = OLD.id;
 	END;
 
+PRAGMA user_version=3;

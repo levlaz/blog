@@ -6,3 +6,5 @@
  */
 ALTER TABLE posts
     ADD COLUMN is_static_page INTEGER DEFAULT 1;
+
+PRAGMA user_version=4;
