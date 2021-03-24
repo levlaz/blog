@@ -11,3 +11,4 @@ settings.cfg
 htmlcov/
 flake8.txt
 .vscode/
+__pycache__

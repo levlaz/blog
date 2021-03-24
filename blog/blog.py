@@ -16,8 +16,7 @@ from threading import Thread
 import markdown
 from flask import (Flask, abort, current_app, flash, g, make_response,
                    redirect, render_template, request, session, url_for)
-from flask_cache import Cache
-from flask_mail import Mail, Message
+from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from slugify import slugify
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -27,7 +26,6 @@ app = Flask(__name__)
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
     'CACHE_DEFAULT_TIMEOUT': 3600})
-mail = Mail()
 db = SQLAlchemy()
 
 app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
@@ -37,10 +35,9 @@ app.config.update(dict(
     SQLALCHEMY_DATABASE_URI="sqlite:///blog.db"
 ))
 
-mail.init_app(app)
 db.init_app(app)
 
-from blog.models import Post, Comment
+from blog.models import Post
 
 
 def connect_db():
@@ -86,58 +83,6 @@ def migrate_db():
             print("migration {0} already applied".format(migration_version))
 
 
-def generate_confirmation_token(comment_id, expiration=120000):
-    """Generate JWT token for approval."""
-    s = Serializer(current_app.config['SECRET_KEY'], expiration)
-    return s.dumps({'confirm': comment_id})
-
-
-def confirm(comment_id, token):
-    """Verify token."""
-    s = Serializer(current_app.config['SECRET_KEY'])
-    try:
-        data = s.loads(token)
-    except:
-        return False
-    if data.get('confirm') != int(comment_id):
-        return False
-    return True
-
-
-# Email Functions
-def send_async_email(app, msg):
-    """Send Mail in App Context
-
-    Args:
-        app: current flask app
-        msg: the mail message
-    """
-    with app.app_context():
-        mail.send(msg)
-
-
-def send_email(to, subject, template, **kwargs):
-    """Send email message on a new thread"""
-    app = current_app._get_current_object()
-    msg = Message(subject, recipients=[to])
-    msg.body = render_template(template, **kwargs)
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    return thr
-
-
-def check_spam(comment):
-
-    SPAM_WORDS = [
-        'viagra',
-        'first page of google',
-    ]
-
-    for word in SPAM_WORDS:
-        if word in comment.lower():
-            return True
-
-
 @app.teardown_appcontext
 def close_db(error):
     """Closes db at the end of request."""
@@ -174,40 +119,6 @@ def index():
         posts=posts,
         get_tags=get_tags,
         form_title="Add New Post")
-
-
-@app.route('/admin/')
-def admin():
-    if not session.get('logged_in'):
-        abort(401)
-
-    return render_template(
-        'admin.html',
-        comments=Comment.query.filter_by(is_visible=False, is_spam=False).all(),
-        )
-
-
-@app.route('/admin/comments/<filter>')
-def admin_comments(filter):
-
-    if not session.get('logged_in'):
-        abort(401)
-
-    if filter == 'all':
-        return render_template(
-            'admin/comments.html',
-            comments=Comment.query.all(),
-            )
-    if filter == 'approved':
-        return render_template(
-            'admin/comments.html',
-            comments=Comment.query.filter_by(is_visible=True).all(),
-            )
-    if filter == 'spam':
-        return render_template(
-            'admin/comments.html',
-            comments=Comment.query.filter_by(is_spam=True).all(),
-            )
 
 
 @app.route('/search/')
@@ -273,16 +184,13 @@ def show_post(post_slug):
     db = get_db()
     post = db.execute(
         "SELECT * FROM posts WHERE slug = ?", [post_slug]).fetchone()
-    if (post['is_static_page'] == 0):
+    if post and (post['is_static_page'] == 0):
         return render_template('page.html', post=post)
     elif post:
         return render_template(
             'post.html',
             post=post,
-            get_tags=get_tags,
-            get_comments=get_comments,
-            get_comment_count=get_comment_count,
-            get_comment_children=get_comment_children)
+            get_tags=get_tags)
     else:
         abort(404)
 
@@ -432,73 +340,6 @@ def add_post():
     return redirect(url_for('index'))
 
 
-@app.route('/comment/<int:post_id>', methods=['POST'])
-@app.route('/comment/<int:post_id>/<int:comment_id>', methods=['POST'])
-def add_comment(post_id, comment_id=None):
-    """Add comment to a post"""
-    db = get_db()
-    cursor = db.cursor()
-
-    if session.get('logged_in'):
-        # Prepare comment
-        author = app.config['ADMIN_NAME']
-        email = app.config['ADMIN_EMAIL']
-        website = app.config['SITE_URL']
-        comment_body = request.form['comment_body']
-        notify = 'notify' in request.form
-    else:
-        # Prepare comment
-        author = request.form['author']
-        email = request.form['email']
-        website = request.form['website']
-        comment_body = request.form['comment_body']
-        notify = 'notify' in request.form
-
-    if check_spam(comment_body):
-        return render_template('spam/spammers.html')
-
-    if comment_id is not None:
-        cursor.execute("INSERT INTO comments (post_id, parent_id, author, email, website, comment_body) \
-            VALUES (?, ?, ?, ?, ?, ?)", [post_id, comment_id, author, email, website, comment_body])
-    else:
-        cursor.execute("INSERT INTO comments (post_id, author, email, website, comment_body) \
-            VALUES (?, ?, ?, ?, ?)", [post_id, author, email, website, comment_body])
-
-    comment_id = cursor.lastrowid
-    db.commit()
-
-    if session.get('logged_in'):
-        from blog.blog import db
-
-        comment = Comment.query.get(comment_id)
-        comment.is_visible = True
-        comment.is_from_admin = True
-        db.session.add(comment)
-        db.session.commit()
-
-        flash("Comment added.")
-        return redirect(request.referrer)
-
-    flash("Your comment has been added, once it has been approved it will appear on this post page.")
-
-    post = get_post(post_id)
-
-    subject = "New comment on {0}".format(post['title'])
-    token = generate_confirmation_token(comment_id)
-
-    send_email(
-        app.config['ADMIN_EMAIL'],
-        subject,
-        'mail/comment',
-        post = post['title'],
-        author = author,
-        body = comment_body,
-        comment_id = comment_id,
-        token=token)
-
-    return redirect(request.referrer)
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -519,60 +360,6 @@ def logout():
     flash('You were logged out')
     cache.clear()
     return redirect(url_for('index'))
-
-
-@app.route('/approve_comment/<comment_id>')
-@app.route('/approve_comment/<comment_id>/<token>')
-def approve_comment(comment_id, token=None):
-    from blog.blog import db
-    comment = Comment.query.get(comment_id)
-
-    if token:
-        if confirm(comment_id, token):
-            comment.is_visible = True
-            db.session.add(comment)
-            db.session.commit()
-            flash('Comment approved')
-            return redirect(url_for('show_post', post_slug=comment.post.slug))
-        else:
-            flash('The confirmation link is invalid or has expired.')
-        return redirect(url_for('show_post', post_slug=comment.post.slug))
-
-    if not session.get('logged_in'):
-        abort(401)
-    else:
-        comment.is_visible = True
-        db.session.add(comment)
-        db.session.commit()
-        flash('Comment approved')
-        return redirect(request.referrer)
-
-
-@app.route('/mark_spam/<comment_id>')
-@app.route('/mark_spam/<comment_id>/<token>')
-def mark_spam(comment_id, token=None):
-    from blog.blog import db
-    comment = Comment.query.get(comment_id)
-
-    if token:
-        if confirm(comment_id, token):
-            comment.is_spam = True
-            db.session.add(comment)
-            db.session.commit()
-            flash('Comment marked as spam.')
-            return redirect(url_for('show_post', post_slug=comment.post.slug))
-        else:
-            flash('The confirmation link is invalid or has expired.')
-        return redirect(url_for('show_post', post_slug=comment.post.slug))
-
-    if not session.get('logged_in'):
-        abort(401)
-    else:
-        comment.is_spam = True
-        db.session.add(comment)
-        db.session.commit()
-        flash('Comment marked as spam.')
-        return redirect(request.referrer)
 
 
 def find_tag(tag):
@@ -607,33 +394,6 @@ def get_static_pages():
         WHERE is_static_page = 0
         """).fetchall()
     return cur
-
-
-def get_comments(post_id):
-    """Get comments for a post."""
-    db = get_db()
-    cur = db.execute("""
-        SELECT * FROM comments
-        WHERE is_visible = 1 AND parent_id is NULL AND post_id = ?""", [post_id]).fetchall()
-    return cur
-
-
-def get_comment_children(comment_id):
-    """Get comments for a comment."""
-    db = get_db()
-    cur = db.execute("""
-        SELECT * FROM comments
-        WHERE is_visible = 1 AND parent_id = ?""", [comment_id]).fetchall()
-    return cur
-
-
-def get_comment_count(post_id):
-    """Get count of comments for a post."""
-    db = get_db()
-    cur = db.execute("""
-        SELECT COUNT(id) FROM comments
-        WHERE is_visible = 1 AND post_id = ?""", [post_id]).fetchone()
-    return cur[0]
 
 
 app.jinja_env.globals.update(get_static_pages=get_static_pages)

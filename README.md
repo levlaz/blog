@@ -35,13 +35,3 @@ This project aims to have a robust test suite and 100% code coverage. In order t
 If you wish to test a single test from the tests/ directory then you can run `export BLOG_PATH=$(pwd) && python -m unittest tests/$SINGLE_FILE.py`
 
 If you add new code to this project, please write the corresponding unit and integration tests and ensure that they pass.
-
-### Generating Documentation
-
-From the project root run `pydoc -w ./` to generate documentation for all python files. Then you can remove all of the tests and should move all of the newly generated html files to the docs/ folder.
-
-```
-pydoc -w ./
-rm test*.html
-mv *.html docs/
-```

@@ -29,7 +29,7 @@ nav > a {
 	padding-right: 10px;
 }
 
-a {
+/* a {
 	color: black;
 }
 
@@ -37,7 +37,7 @@ a:hover {
 	text-decoration: underline;
 	color: white;
 	background-color: black;
-}
+} */
 
 blockquote {
 	font-style: italic;
@@ -60,7 +60,7 @@ blockquote {
 
 .blogTitle {
 	text-align: center;
-	width: 300px;
+	width: 500px;
 	margin-left: auto;
 	margin-right: auto;
 	border-bottom: solid 1px lightgray;

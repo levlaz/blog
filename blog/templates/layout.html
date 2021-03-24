@@ -3,7 +3,7 @@
 	<head>
 		{% block head %}
 			{% block title %}
-			<title>levlaz</title>
+			<title>Lev's Hacking Notes</title>
 			{% endblock %}
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width; initial-scale=1.0" />
@@ -14,7 +14,7 @@
 
 	<body>
 
-		<h1 class="blogTitle"> levlaz </h1>
+		<h1 class="blogTitle"> Lev's Hacking Notes </h1>
 
 		<nav>
 			<a href="{{ url_for('index') }}">Home</a>
@@ -31,7 +31,6 @@
 			<a href="{{ url_for('login') }}">Log In</a>
 			{% else %}
 			<a href="{{ url_for('logout') }}">Log Out</a>
-			<a href="{{ url_for('admin') }}">Admin</a>
 			{% endif %}
 
 			<form id="searchForm" action="/search" method="get">
@@ -52,33 +51,12 @@
 
 		<footer>
 			<span class="left">
-	 		Copyright &copy; 2011 - 2017 <a href="https://levlaz.org/about-me">Lev Lazinskiy</a>
-			<br />
-			<a class="cc" href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license"><img class="cc" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" alt="Creative Commons License"/></a>
-			<br />
-				<span class="about_software">
-				Running on <a href="https://github.com/levlaz/blog">levlaz/blog v0.6.0</a>. A simple blogging app written in Python and licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License v3</a>.
-				<br />
-				<br />
-				<span>
+			<small>
+	 		Copyright &copy; 2021 Lev Lazinskiy
+			<br>
+				All content in this blog is released under a <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons CC BY-SA 4.0 License</a>.
+			</small>
 			</span>
-
-			<!-- Piwik -->
-			<script type="text/javascript">
-			var _paq = _paq || [];
-			/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-			_paq.push(['trackPageView']);
-			_paq.push(['enableLinkTracking']);
-			(function() {
-				var u="//piwik.levlaz.org/";
-				_paq.push(['setTrackerUrl', u+'piwik.php']);
-				_paq.push(['setSiteId', '1']);
-				var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-				g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-			})();
-			</script>
-			<!-- End Piwik Code -->
-
 		</footer>
 
 	</body>

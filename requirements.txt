@@ -1,9 +1,9 @@
-flask==0.12.2
-python-slugify==1.2.4
-markdown==2.6.9
-Pygments==2.2.0
+flask
+python-slugify
+markdown
+Pygments
 
 # Flask Extensions
-Flask-Cache==0.13.1
-Flask-Mail==0.9.1
-Flask-SQLAlchemy==2.3.1
+flask-caching
+Flask-Mail
+Flask-SQLAlchemy
