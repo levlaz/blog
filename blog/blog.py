@@ -206,7 +206,7 @@ def edit_post(id):
     if request.method == 'POST':
 
         # Prepare Post
-        title = request.form['title']
+        title = request.form['title'].strip()
         text_raw = request.form['text'].strip()
         slug = slugify(title)
         text_compiled = markdown.markdown(
@@ -301,7 +301,7 @@ def add_post():
     cursor = db.cursor()
 
     # Prepare Post
-    title = request.form['title']
+    title = request.form['title'].strip()
     text_raw = request.form['text'].strip()
     slug = slugify(title)
     text_compiled = markdown.markdown(
