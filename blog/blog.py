@@ -11,6 +11,7 @@ import datetime
 import os
 import sqlite3
 from collections import OrderedDict
+from email import utils
 from threading import Thread
 
 import markdown
@@ -18,9 +19,9 @@ from flask import (Flask, abort, current_app, flash, g, make_response,
                    redirect, render_template, request, session, url_for)
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from slugify import slugify
 from werkzeug.security import check_password_hash, generate_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 app = Flask(__name__)
 cache = Cache(app, config={
@@ -178,6 +179,9 @@ def archive():
 @app.route('/feed/')
 @cache.cached()
 def gen_feed():
+    """
+    Generate a valid RSS feed.
+    """
     db = get_db()
     cur = db.execute(
         "SELECT * FROM posts \
@@ -187,7 +191,8 @@ def gen_feed():
     feed = render_template(
             'rss.xml',
             posts=posts,
-            gen_date=datetime.datetime.utcnow())
+            gen_date=utils.format_datetime(datetime.datetime.utcnow()),
+            formatter=utils.format_datetime)
     response = make_response(feed)
     response.headers['Content-Type'] = "application/xml"
     return response

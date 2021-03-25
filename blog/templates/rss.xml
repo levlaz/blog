@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"
-	xmlns:content="http://purl.org/rss/1.0/modules/content/"
-	>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
-		<title>levlaz</title>
-		<link>https://levlaz.org</link>
-		<description>Having The Best Day of My Life</description>
+		<title>Lev's Hacking Notes</title>
+		<link>https://dev.levlaz.org</link>
+		<description>Notes, Thoughts, and Ideas about Technology.</description>
 		<language>en-us</language>
-		<pubDate> {{ gen_date.strftime('%a, %d %b %y %T') }} UTC </pubDate>
-		<lastBuildDate> {{ gen_date.strftime('%a, %d %b %y %T') }} </lastBuildDate>
+		<pubDate> {{ gen_date }} </pubDate>
+		<lastBuildDate> {{ gen_date }} </lastBuildDate>
 		<generator>https://github.com/levlaz/blog</generator>
-		<managingEditor>lev@levlaz.org</managingEditor>
-		<webMaster>lev@levlaz.org</webMaster>
+		<managingEditor>lev@levlaz.org (Lev Lazinskiy)</managingEditor>
+		<webMaster>lev@levlaz.org (Lev Lazinskiy)</webMaster>
+		<atom:link href="https://dev.levlaz.org/feed/" rel="self" type="application/rss+xml" />
 		{% for post in posts %}
 		<item>
 			<title>{{ post.title }}</title>
@@ -22,7 +21,7 @@
 			<content:encoded>
 				<![CDATA[{{ post.text_compiled|safe }}]]>
 			</content:encoded>
-			<pubDate> {{ post.created_date }}</pubDate>
+			<pubDate> {{ formatter(post.created_date) }}</pubDate>
 			<guid> {{ url_for('show_post', post_slug=post.slug, _external=True) }}</guid>
 		</item>
 		{% endfor %}
