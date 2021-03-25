@@ -91,7 +91,7 @@ def get_openring():
     """
     try:
         # TODO make this a config value
-        with open('/var/www/openring/openring.html') as f:
+        with open('/var/www/openring/openring.html', encoding="utf-8") as f:
             return f.read()
     except IOError:
         print("ERROR: openring file does not exist")
