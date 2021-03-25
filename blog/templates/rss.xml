@@ -17,7 +17,7 @@
 			<title>{{ post.title }}</title>
 			<link>{{ url_for('show_post', post_slug=post.slug, _external=True) }}</link>
 			<description>
-				{{  post.text_raw }}
+				{{  post.text_compiled|striptags|truncate }}
 			</description>
 			<content:encoded>
 				<![CDATA[{{ post.text_compiled|safe }}]]>
