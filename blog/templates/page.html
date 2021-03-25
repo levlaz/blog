@@ -6,7 +6,7 @@
 {% block body %}
 
 	<h2 class="postTitle">
-		<a href="{{ post.slug }}">{{ post.title }}</a>
+		<a href="{{ url_for('show_post', post_slug=post.slug) }}">{{ post.title }}</a>
 	</h2>
 
 	<div class="postText">
