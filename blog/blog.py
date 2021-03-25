@@ -83,6 +83,20 @@ def migrate_db():
             print("migration {0} already applied".format(migration_version))
 
 
+def get_openring():
+    """
+    Try to get openring file. 
+    
+    Returns HTML String.
+    """
+    try:
+        # TODO make this a config value
+        with open('/var/www/openring/openring.html') as f:
+            return f.read()
+    except IOError:
+        print("ERROR: openring file does not exist")
+
+
 @app.teardown_appcontext
 def close_db(error):
     """Closes db at the end of request."""
@@ -182,6 +196,7 @@ def gen_feed():
 @app.route('/<string:post_slug>/')
 def show_post(post_slug):
     db = get_db()
+    openring = get_openring()
     post = db.execute(
         "SELECT * FROM posts WHERE slug = ?", [post_slug]).fetchone()
     if post and (post['is_static_page'] == 0):
@@ -190,7 +205,8 @@ def show_post(post_slug):
         return render_template(
             'post.html',
             post=post,
-            get_tags=get_tags)
+            get_tags=get_tags,
+            openring=openring)
     else:
         abort(404)
 
