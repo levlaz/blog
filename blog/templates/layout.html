@@ -22,7 +22,7 @@
 			<a href="{{ url_for('show_tags_list') }}">Tags</a>
 
 			{% for page in get_static_pages() %}
-				<a href="{{ url_for('show_post', post_slug=page.slug) }}"> {{ page.title }} </a>
+				<a href="{{ url_for('show_post', post_slug=page.slug) }}">{{ page.title }}</a>
 			{% endfor %}
 
 			<a href="{{ url_for('gen_feed') }}">RSS</a>
