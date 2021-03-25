@@ -18,7 +18,6 @@ import markdown
 from flask import (Flask, abort, current_app, flash, g, make_response,
                    redirect, render_template, request, session, url_for)
 from flask_caching import Cache
-from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from slugify import slugify
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -27,19 +26,12 @@ app = Flask(__name__)
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
     'CACHE_DEFAULT_TIMEOUT': 3600})
-db = SQLAlchemy()
 
 app.config.from_pyfile(os.path.join(app.root_path, 'settings.cfg'))
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'blog.db'),
-    SQLALCHEMY_DATABASE_URI="sqlite:///blog.db"
+    DATABASE=os.path.join(app.root_path, 'blog.db')
 ))
-
-db.init_app(app)
-
-from blog.models import Post
-
 
 def connect_db():
     """Connects to Database."""

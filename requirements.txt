@@ -5,5 +5,3 @@ Pygments
 
 # Flask Extensions
 flask-caching
-Flask-Mail
-Flask-SQLAlchemy
